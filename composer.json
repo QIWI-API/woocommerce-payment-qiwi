@@ -1,0 +1,48 @@
+{
+  "name": "qiwi/woocommerce-payment-qiwi",
+  "description": "QIWI payment integration for Woocommerce",
+  "type": "wordpress-plugin",
+  "version": "0.0.1",
+  "license": "MIT",
+  "homepage": "https://github.com/QIWI-API/woocommerce-payment-qiwi",
+  "support": {
+    "issues": "https://github.com/QIWI-API/woocommerce-payment-qiwi/issues"
+  },
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://wpackagist.org"
+    }
+  ],
+  "require": {
+    "php": ">=7",
+    "ext-curl": "*",
+    "composer/installers": "^1",
+    "qiwi/bill-payments-php-sdk": "^0",
+    "woocommerce/woocommerce": "^3"
+  },
+  "require-dev": {
+    "dealerdirect/phpcodesniffer-composer-installer": "^0",
+    "phpdocumentor/phpdocumentor": "^2",
+    "squizlabs/php_codesniffer": "^3",
+    "wimg/php-compatibility": "^8",
+    "wp-coding-standards/wpcs": "^0"
+  },
+  "autoload": {
+    "classmap": [
+      "includes/"
+    ]
+  },
+  "scripts": {
+    "docs": "phpdoc run",
+    "code": "phpcs --encoding=utf-8 -s -p woocommerce-payment-qiwi.php includes"
+  },
+  "extra": {
+    "installer-disable": true
+  },
+  "config": {
+    "platform": {
+      "php": "7.0"
+    }
+  }
+}

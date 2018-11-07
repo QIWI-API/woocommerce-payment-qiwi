@@ -1,0 +1,146 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Woocommerce QIWI payment gateway\n"
+"POT-Creation-Date: 2018-11-07 14:49+0500\n"
+"PO-Revision-Date: 2018-11-07 14:50+0500\n"
+"Last-Translator: \n"
+"Language-Team: https://github.com/QIWI-API/woocommerce-payment-qiwi\n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
+"X-Generator: Poedit 2.2\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-Flags-xgettext: --add-comments=translators:\n"
+"X-Poedit-WPHeader: woocommerce-payment-qiwi.php\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
+"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;"
+"_n_noop:1,2;_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.js\n"
+"X-Poedit-SearchPathExcluded-1: vendor\n"
+
+#. Author of the plugin/theme
+#: includes/class-gateway.php:65 woocommerce-payment-qiwi.php:30
+#: woocommerce-payment-qiwi.php:31
+msgid "QIWI"
+msgstr "QIWI Касса"
+
+#: includes/class-gateway.php:66
+msgid "Processing via QIWI Universal Payment Protocol"
+msgstr "Универсальный платежный протокол QIWI"
+
+#: includes/class-gateway.php:121
+msgid "Turn On/off"
+msgstr "Включение / выключение"
+
+#: includes/class-gateway.php:123
+msgid "Activate the payment module for QIWI Universal Payment Protocol "
+msgstr ""
+"Активировать модуль оплаты для универсального платежного протокола QIWI "
+
+#: includes/class-gateway.php:127
+msgid "Title"
+msgstr "Заголовок"
+
+#: includes/class-gateway.php:129
+msgid "The name that the user sees when selecting the payment type"
+msgstr "Имя, отображаемое клиентам при выборе типа платежа"
+
+#: includes/class-gateway.php:133
+msgid "Description"
+msgstr "Описание"
+
+#: includes/class-gateway.php:135
+msgid "Description that the user sees when selecting the payment type"
+msgstr "Описание, которое видит клиент при выборе типа оплаты"
+
+#: includes/class-gateway.php:139
+msgid "Secret key"
+msgstr "Секретный ключ"
+
+#: includes/class-gateway.php:141
+msgid "Key to authenticate your requests"
+msgstr "Ключ для аутентификации ваших запросов"
+
+#: includes/class-gateway.php:144
+msgid "Notification URL"
+msgstr "URL-адрес уведомлений"
+
+#: includes/class-gateway.php:147
+msgid "Set the field in the store settings"
+msgstr "Задайте это значение в настройках магазина"
+
+#: includes/class-gateway.php:151
+msgid "Success URL"
+msgstr "URL успеха"
+
+#: includes/class-gateway.php:153
+msgid "Page transition on successful payment (successURL)"
+msgstr ""
+"Страница, на которую клиент перейдет после успешного платежа (successURL)"
+
+#: includes/class-gateway.php:155
+msgid "Page \"Order received\" from WooCommerce"
+msgstr "Страница \"заказ получен\" от WooCommerce"
+
+#: includes/class-gateway.php:156
+msgid "Checkout page from WooCommerce"
+msgstr "Страница оформления заказа из WooCommerce"
+
+#. translators: Take note of refund ID - a uuid v4 string.
+#: includes/class-gateway.php:196
+#, php-format
+msgid "Make refund ID # %1$s"
+msgstr "Сделан возврат ID # %1$s"
+
+#: includes/class-gateway.php:244
+msgid "Expected invoice payment notification."
+msgstr "Ожидается платежное уведомление."
+
+#: includes/class-gateway.php:257
+msgid "Invalid notification signature."
+msgstr "Недействительная подпись уведомления."
+
+#: includes/class-gateway.php:272
+msgid "Order not found."
+msgstr "Заказ не найден."
+
+#: includes/class-gateway.php:283
+msgid "Invoice rejected by customer."
+msgstr "Счет отклонен клиентом."
+
+#: includes/class-gateway.php:286
+msgid "Error when making a payment. The bill is not paid."
+msgstr "Ошибка при совершении платежа. Счет не оплачен."
+
+#: includes/class-gateway.php:289
+msgid "Payment session expired. The bill is not paid."
+msgstr "Платежная сессия истекла. Счет не оплачен."
+
+#: includes/class-gateway.php:292
+msgid "Order payment not done. Order status Unknown."
+msgstr "Оплата заказа не выполнена. Статус заказа неизвестен."
+
+#: includes/class-gateway.php:330
+msgid "Awaiting payment"
+msgstr "Ожидание оплаты"
+
+#. Plugin Name of the plugin/theme
+msgid "Woocommerce QIWI payment gateway"
+msgstr "Платежный шлюз QIWI для Woocommerce"
+
+#. Plugin URI of the plugin/theme
+msgid "https://github.com/QIWI-API/woocommerce-payment-qiwi"
+msgstr "https://github.com/QIWI-API/woocommerce-payment-qiwi"
+
+#. Description of the plugin/theme
+msgid "QIWI universal payment API integration for Woocommerce"
+msgstr "Интеграция Универсального платежного протокола QIWI для Woocommerce"
+
+#. Author URI of the plugin/theme
+msgid "https://qiwi.com/"
+msgstr "https://qiwi.com/"
