@@ -1,0 +1,7 @@
+@charset "UTF-8";
+
+#payment .payment_methods li img.qiwi {
+	float: none;
+	display: inline-block;
+	vertical-align: middle;
+}

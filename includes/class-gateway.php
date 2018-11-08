@@ -9,15 +9,14 @@ namespace Qiwi\Payment;
 
 defined( 'ABSPATH' ) || exit;
 
+use WC_HTTPS;
 use WC_Order;
 use WC_Payment_Gateway;
-use WC_Order_Refund;
 use WP_REST_Server;
 use WP_Error;
 use Exception;
 use ErrorException;
 use Qiwi\Api\BillPayments;
-use Qiwi\Api\BillPaymentsException;
 
 /**
  * QIWI payment gateway.
@@ -59,21 +58,61 @@ class Gateway extends WC_Payment_Gateway {
 	protected $secret_key;
 
 	/**
+	 * The supported ways.
+	 *
+	 * @var string
+	 */
+	protected $method_supports;
+
+	/**
+	 * The title icon.
+	 *
+	 * @var string
+	 */
+	protected $title_icon;
+
+	/**
 	 * Gateway constructor.
 	 */
 	public function __construct() {
-		$this->method_title       = __( 'QIWI', 'woocommerce_payment_qiwi' );
-		$this->method_description = __( 'Processing via QIWI Universal Payment Protocol', 'woocommerce_payment_qiwi' );
-		$this->icon               = plugins_url( 'assets/icon.png', __DIR__ );
-		$this->notification_url   = site_url() . '/?wc-api=' . $this->id;
+		/*
+		 * translators:
+		 * ru_RU: QIWI Касса
+		 */
+		$this->method_title = __( 'QIWI cash', 'woocommerce_payment_qiwi' );
 
+		/*
+		 * translators:
+		 * ru_RU: Оплата через: VISA, MasterCard, МИР, Баланс телефона, QIWI Кошелек
+		 */
+		$this->method_supports = __( 'Payment over: VISA, MasterCard, MIR, Phone balance, QIWI Wallet', 'woocommerce_payment_qiwi' );
+
+		/*
+		 * translators:
+		 * ru_RU: Оплата с банковских карт, QIWI Кошелька и баланса телефона. Гарантия безопасности ваших платежей.
+		 */
+		$this->method_description = __( 'Payment from bank cards, QIWI Wallet and phone balance. Guaranteed security of your payments.', 'woocommerce_payment_qiwi' );
+
+		// Getaway accept billing and refunding.
+		$this->supports = [ 'products', 'refunds' ];
+
+		// Setup icons.
+		$this->icon       = plugins_url( 'assets/payment.png', __DIR__ );
+		$this->title_icon = plugins_url( 'assets/qiwi.png', __DIR__ );
+
+		// Setup readonly props.
+		$this->notification_url = site_url() . '/?wc-api=' . $this->id;
+
+		// Initialise config and form.
 		$this->init_form_fields();
 		$this->init_settings();
 
+		// Set up from options.
 		$this->title       = $this->get_option( 'title', $this->method_title );
 		$this->description = $this->get_option( 'description', $this->method_description );
 		$this->secret_key  = $this->get_option( 'secret_key' );
 
+		// Setup CURL options.
 		$options = [];
 		$ca_path = dirname( __DIR__ ) . DIRECTORY_SEPARATOR . 'cacert.pem';
 		if ( is_file( $ca_path ) ) {
@@ -82,6 +121,7 @@ class Gateway extends WC_Payment_Gateway {
 			$options[ CURLOPT_CAINFO         ] = $ca_path;
 		}
 
+		// Initialise API.
 		try {
 			$this->bill_payments = new BillPayments( $this->secret_key, $options );
 		} catch ( ErrorException $exception ) {
@@ -92,16 +132,53 @@ class Gateway extends WC_Payment_Gateway {
 			));
 		}
 
-		add_action( 'woocommerce_update_options_payment_gateways', [ $this, 'process_admin_options' ] );
-		add_action( 'woocommerce_order_refunded', [ $this, 'woocommerce_order_refunded' ], 10, 2 );
-		add_action( 'woocommerce_order_status_cancelled', [ $this, 'woocommerce_order_status_cancelled' ] );
+		// Capture API callback.
 		add_action( "woocommerce_api_{$this->id}", [ $this, 'woocommerce_api' ] );
 
-		$this->display_errors();
-
 		if ( is_admin() ) {
-			add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, [ $this, 'process_admin_options' ] );
+			// Capture options change.
+			add_action( "woocommerce_update_options_payment_gateways_{$this->id}", [ $this, 'process_admin_options' ] );
+		} else {
+			// Add frontend style.
+			wp_enqueue_style(
+				'woocommerce-payment-qiwi',
+				plugins_url( '/assets/qiwi.css', __DIR__ ),
+				[],
+				filemtime( dirname( __DIR__ ) . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'qiwi.css' )
+			);
 		}
+	}
+
+	/**
+	 * Return the gateway's title.
+	 *
+	 * @return string
+	 */
+	public function get_title() {
+		if ( is_admin() ) {
+			return parent::get_title();
+		}
+		$title = $this->icon ? '<img src="' . WC_HTTPS::force_https_url( $this->title_icon ) . '" alt="' . esc_attr( $this->title ) . '" class="qiwi" />' : '';
+		return apply_filters( 'woocommerce_gateway_title', $title, $this->id );
+	}
+
+	/**
+	 * Return the gateway's icon.
+	 *
+	 * @return string
+	 */
+	public function get_icon() {
+		$icon = $this->icon ? '<img src="' . WC_HTTPS::force_https_url( $this->icon ) . '" alt="' . esc_attr( $this->method_supports ) . '" />' : '';
+		return apply_filters( 'woocommerce_gateway_icon', $icon, $this->id );
+	}
+
+	/**
+	 * Check gateway not ready for use.
+	 *
+	 * @return bool
+	 */
+	public function needs_setup() {
+		return ! empty( $this->secret_key ) || ! empty( $this->bill_payments );
 	}
 
 	/**
@@ -109,6 +186,8 @@ class Gateway extends WC_Payment_Gateway {
 	 */
 	public function init_settings() {
 		parent::init_settings();
+
+		// Readonly option.
 		$this->settings['notification_url'] = $this->notification_url;
 	}
 
@@ -118,205 +197,177 @@ class Gateway extends WC_Payment_Gateway {
 	public function init_form_fields() {
 		$this->form_fields = [
 			'enabled'          => [
+
+				/*
+				 * translators:
+				 * ru_RU: Включение / выключение
+				 */
 				'title'   => __( 'Turn On/off', 'woocommerce_payment_qiwi' ),
+
+				/*
+				 * translators:
+				 * ru_RU: Активировать модуль оплаты %1$s
+				 * 1: Название модуля
+				 */
+				'label'   => sprintf( __( 'Activate payment module %1$s', 'woocommerce_payment_qiwi' ), $this->method_title ),
 				'type'    => 'checkbox',
-				'label'   => __( 'Activate the payment module for QIWI Universal Payment Protocol ', 'woocommerce_payment_qiwi' ),
 				'default' => 'no',
 			],
 			'title'            => [
+
+				/*
+				 * translators:
+				 * ru_RU: Заголовок
+				 */
 				'title'       => __( 'Title', 'woocommerce_payment_qiwi' ),
+
+				/*
+				 * translators:
+				 * ru_RU: Название метода оплаты, отображаемое клиентам.
+				 */
+				'description' => __( 'The name of the payment method displayed to customers.', 'woocommerce_payment_qiwi' ),
 				'type'        => 'text',
-				'description' => __( 'The name that the user sees when selecting the payment type', 'woocommerce_payment_qiwi' ),
 				'default'     => $this->method_title,
 			],
 			'description'      => [
+
+				/*
+				 * translators:
+				 * ru_RU: Описание
+				 */
 				'title'       => __( 'Description', 'woocommerce_payment_qiwi' ),
+
+				/*
+				 * translators:
+				 * ru_RU: Описание метода оплаты, отображаемое клиентам.
+				 */
+				'description' => __( 'Description of the payment method displayed to customers.', 'woocommerce_payment_qiwi' ),
 				'type'        => 'textarea',
-				'description' => __( 'Description that the user sees when selecting the payment type', 'woocommerce_payment_qiwi' ),
 				'default'     => $this->method_description,
 			],
 			'secret_key'       => [
+
+				/*
+				 * translators:
+				 * ru_RU: Секретный ключ
+				 */
 				'title'       => __( 'Secret key', 'woocommerce_payment_qiwi' ),
+
+				/*
+				 * translators:
+				 * ru_RU: Ключ к платежной системе для вашего магазина.
+				 */
+				'description' => __( 'The key to the payment system for your store.', 'woocommerce_payment_qiwi' ),
 				'type'        => 'password',
-				'description' => __( 'Key to authenticate your requests', 'woocommerce_payment_qiwi' ),
 			],
 			'notification_url' => [
-				'title'       => __( 'Notification URL', 'woocommerce_payment_qiwi' ),
+
+				/*
+				 * translators:
+				 * ru_RU: Адрес для уведомлений
+				 */
+				'title'       => __( 'Notification address', 'woocommerce_payment_qiwi' ),
+
+				/*
+				 * translators:
+				 * ru_RU: Установите это значение в настройках магазина платежной системы.
+				 */
+				'description' => __( 'Set this value in the payment system store settings.', 'woocommerce_payment_qiwi' ),
 				'type'        => 'text',
 				'disabled'    => true,
-				'description' => __( 'Set the field in the store settings', 'woocommerce_payment_qiwi' ),
 				'default'     => $this->notification_url,
 			],
-			'success_url'      => [
-				'title'       => __( 'Success URL', 'woocommerce_payment_qiwi' ),
-				'type'        => 'select',
-				'description' => __( 'Page transition on successful payment (successURL)', 'woocommerce_payment_qiwi' ),
-				'options'     => [
-					'success'  => __( 'Page "Order received" from WooCommerce', 'woocommerce_payment_qiwi' ),
-					'checkout' => __( 'Checkout page from WooCommerce', 'woocommerce_payment_qiwi' ),
-				],
-			],
 		];
-	}
-
-	/**
-	 * Refund QIWI bill.
-	 *
-	 * @param string $order_id The order ID.
-	 * @param string $refund_id The refund ID.
-	 */
-	public function woocommerce_order_refunded( $order_id, $refund_id ) {
-		$self    = new self();
-		$order   = wc_get_order( $order_id );
-		$refunds = $order->get_refunds();
-		$refund  = null;
-		if ( $refunds ) {
-			/**
-			 * The order refund.
-			 *
-			 * @var WC_Order_Refund $refund
-			 */
-			foreach ( $refunds as $refund ) {
-				if ( $refund->get_id() === $refund_id ) {
-					$refund = wc_get_order( $refund_id );
-					break;
-				}
-			}
-		}
-		$bill_id = $order->get_transaction_id( $order_id );
-		try {
-			$bill_refund_id = $self->bill_payments->generateId();
-			$self->bill_payments->refund(
-				$bill_id,
-				$bill_refund_id,
-				$refund->get_amount(),
-				$refund->get_currency()
-			);
-			/* translators: Take note of refund ID - a uuid v4 string. */
-			$order->add_order_note( sprintf( __( 'Make refund ID # %1$s', 'woocommerce_payment_qiwi' ), $bill_refund_id ) );
-		} catch ( Exception $exception ) {
-			wc_add_wp_error_notices( new \WP_Error(
-				$exception->getCode(),
-				$exception->getMessage(),
-				$exception
-			) );
-		}
-	}
-
-	/**
-	 * Cancel QIWI bill.
-	 *
-	 * @param string $order_id The order ID.
-	 */
-	public function woocommerce_order_status_cancelled( $order_id ) {
-		$self    = new self();
-		$order   = wc_get_order( $order_id );
-		$bill_id = $order->get_transaction_id( $order_id );
-		try {
-			$bill = $self->bill_payments->getBillInfo( $bill_id );
-			if ( 'WAITING' === $bill['status']['value'] ) {
-				$bill = $self->bill_payments->cancelBill( $bill_id );
-				wp_redirect( $bill['payUrl'], 301 );
-			}
-		} catch ( BillPaymentsException $exception ) {
-			wc_add_wp_error_notices(new \WP_Error(
-				$exception->getCode(),
-				$exception->getMessage(),
-				$exception
-			));
-		}
 	}
 
 	/**
 	 * Process QIWI notification.
 	 */
 	public function woocommerce_api() {
-		$headers = headers_list();
-		$body    = WP_REST_Server::get_raw_data();
-
-		if (
-			! is_array( $headers ) ||
-			! array_key_exists( 'X-Api-Signature-SHA256', $headers ) ||
-			! is_string( $body )
-		) {
-			wp_send_json( [
-				'error'  => 1,
-				'notice' => __( 'Expected invoice payment notification.', 'woocommerce_payment_qiwi' ),
-			], 400 );
-		}
-
+		// Get request data.
+		$sign   = array_key_exists( 'HTTP_X_API_SIGNATURE_SHA256', $_SERVER ) ? wp_unslash( $_SERVER['HTTP_X_API_SIGNATURE_SHA256'] ) : '';  // phpcs:ignore WordPress.VIP
+		$body   = WP_REST_Server::get_raw_data();
 		$notice = json_decode( $body, true );
 
-		if ( ! $this->bill_payments->checkNotificationSignature(
-			$headers['X-Api-Signature-SHA256'],
-			$notice,
-			$this->secret_key
-		) ) {
-			wp_send_json( [
-				'error'  => 1,
-				'notice' => __( 'Invalid notification signature.', 'woocommerce_payment_qiwi' ),
-			], 403 );
+		// Check signature.
+		if ( ! $this->bill_payments->checkNotificationSignature( $sign, $notice, $this->secret_key ) ) {
+			wp_send_json( [ 'error' => 403 ], 403 );
 		}
 
+		// Get order.
 		$orders = wc_get_orders([
 			'limit'          => 1,
 			'transaction_id' => $notice['bill']['billId'],
 		]);
-
-		if (
-			! is_array( $orders ) ||
-			empty( $orders )
-		) {
-			wp_send_json( [
-				'error'  => 1,
-				'notice' => __( 'Order not found.', 'woocommerce_payment_qiwi' ),
-			], 404 );
-		}
-
+		/**
+		 * The order.
+		 *
+		 * @var WC_Order $order
+		 */
 		$order = reset( $orders );
 
+		// Process status.
 		switch ( $notice['bill']['status']['value'] ) {
+			case 'WAITING':
+				$order->update_status( 'pending' );
+				break;
 			case 'PAID':
-				$order->update_status( 'completed' );
+				$order->payment_complete();
 				break;
-			case 'rejected':
-				$order->update_status( 'failed', __( 'Invoice rejected by customer.', 'woocommerce_payment_qiwi' ) );
+			case 'REJECTED':
+				$order->update_status( 'canceled' );
 				break;
-			case 'unpaid':
-				$order->update_status( 'failed', __( 'Error when making a payment. The bill is not paid.', 'woocommerce_payment_qiwi' ) );
+			case 'EXPIRED':
+				$order->update_status( 'failed' );
 				break;
-			case 'expired':
-				$order->update_status( 'failed', __( 'Payment session expired. The bill is not paid.', 'woocommerce_payment_qiwi' ) );
+			case 'PARTIAL':
+				$order->update_status( 'processing' );
 				break;
-			default:
-				$order->add_order_note( __( 'Order payment not done. Order status Unknown.', 'woocommerce_payment_qiwi' ) );
+			case 'FULL':
+				$order->update_status( 'refunded' );
+				break;
 		}
-		$order->save();
 		wp_send_json( [ 'error' => 0 ], 200 );
 	}
 
 	/**
 	 * Process the payment and return the result.
 	 *
-	 * @param string $order_id The order ID.
+	 * @param int $order_id The order ID.
 	 * @return array
 	 */
 	public function process_payment( $order_id ) {
-		global $woocommerce;
+		// Get processed data.
+		$order   = wc_get_order( $order_id );
+		$bill_id = $order->get_transaction_id();
 
-		$order = new WC_Order( $order_id );
-
+		// Return notice on trow.
 		try {
-			$bill_id = $this->bill_payments->generateId();
-			$bill    = $this->bill_payments->createBill( $bill_id, [
-				'amount'             => $order->get_total(),
-				'currency'           => $order->get_currency(),
-				'expirationDateTime' => $this->bill_payments->getLifetimeByDay(),
-				'phone'              => $order->get_billing_phone(),
-				'email'              => $order->get_billing_email(),
-				'account'            => $order->get_user_id(),
-				'successUrl'         => $this->get_return_url( $order ),
-			]);
+			// Need to create bill transaction.
+			if ( empty( $bill_id ) ) {
+				$bill_id = $this->bill_payments->generateId();
+				$bill    = $this->bill_payments->createBill( $bill_id, [
+					'amount'             => $order->get_total(),
+					'currency'           => $order->get_currency(),
+					'expirationDateTime' => $this->bill_payments->getLifetimeByDay(),
+					'phone'              => $order->get_billing_phone(),
+					'email'              => $order->get_billing_email(),
+					'account'            => $order->get_user_id(),
+					'successUrl'         => $this->get_return_url( $order ),
+				]);
+				$order->set_transaction_id( $bill_id );
+				$order->save();
+
+				// Reduce stock levels.
+				wc_reduce_stock_levels( $order->get_id() );
+
+				// Remove cart.
+				wc_empty_cart();
+			} elseif ( ! $order->is_paid() && $order->get_status() === 'cancelled' ) {
+				$bill = $this->bill_payments->cancelBill( $bill_id );
+			} else {
+				$bill = $this->bill_payments->getBillInfo( $bill_id );
+			}
 		} catch ( Exception $exception ) {
 			wc_add_wp_error_notices(new WP_Error(
 				$exception->getCode(),
@@ -326,19 +377,64 @@ class Gateway extends WC_Payment_Gateway {
 			return [ 'result' => 'fail' ];
 		}
 
-		// Mark as on-hold (we're awaiting the cheque).
-		$order->update_status( 'on-hold', __( 'Awaiting payment', 'woocommerce_payment_qiwi' ) );
-
-		// Reduce stock levels.
-		wc_reduce_stock_levels( $order->get_id() );
-
-		// Remove cart.
-		$woocommerce->cart->empty_cart();
-
 		// Return thank you redirect.
 		return [
 			'result'   => 'success',
 			'redirect' => $this->bill_payments->getPayUrl( $bill, $this->get_return_url( $order ) ),
 		];
+	}
+
+	/**
+	 * Process refunding.
+	 *
+	 * @param int    $order_id The order ID.
+	 * @param null   $amount   The refund amount.
+	 * @param string $reason   The refund reason.
+	 * @return bool|WP_Error
+	 */
+	public function process_refund( $order_id, $amount = null, $reason = null ) {
+		// Extract data.
+		$order   = wc_get_order( $order_id );
+		$bill_id = $order->get_transaction_id();
+
+		// Generated refund transaction ID.
+		try {
+			$refund_id = $this->bill_payments->generateId();
+		} catch ( Exception $exception ) {
+			return new WP_Error(
+				$exception->getCode(),
+				$exception->getMessage(),
+				$exception
+			);
+		}
+
+		// Refund transaction.
+		try {
+			$refund = $this->bill_payments->refund( $bill_id, $refund_id, $amount, $order->get_currency() );
+		} catch ( Exception $exception ) {
+			return new WP_Error(
+				$exception->getCode(),
+				$exception->getMessage(),
+				$exception
+			);
+		}
+
+		// Process result.
+		switch ( $refund['status'] ) {
+			case 'PARTIAL':
+			case 'FULL':
+				$order->add_order_note(sprintf(
+
+					/*
+					 * translators:
+					 * ru_RU: Выполнен возврат %1$s
+					 * 1: ID транзакции
+					 */
+					__( 'Completed refund  %1$s', 'woocommerce_payment_qiwi' ),
+					$refund_id
+				));
+				return true;
+		}
+		return false;
 	}
 }
