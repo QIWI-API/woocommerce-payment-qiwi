@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Woocommerce QIWI payment gateway\n"
-"POT-Creation-Date: 2018-11-07 14:49+0500\n"
-"PO-Revision-Date: 2018-11-07 14:50+0500\n"
+"POT-Creation-Date: 2018-11-08 19:12+0500\n"
+"PO-Revision-Date: 2018-11-08 19:15+0500\n"
 "Last-Translator: \n"
 "Language-Team: https://github.com/QIWI-API/woocommerce-payment-qiwi\n"
 "Language: ru_RU\n"
@@ -23,111 +23,116 @@ msgstr ""
 "X-Poedit-SearchPathExcluded-0: *.js\n"
 "X-Poedit-SearchPathExcluded-1: vendor\n"
 
-#. Author of the plugin/theme
-#: includes/class-gateway.php:65 woocommerce-payment-qiwi.php:30
-#: woocommerce-payment-qiwi.php:31
-msgid "QIWI"
+#. translators:
+#. ru_RU: QIWI Касса
+#.
+#: includes/class-gateway.php:85
+msgid "QIWI Сash"
 msgstr "QIWI Касса"
 
-#: includes/class-gateway.php:66
-msgid "Processing via QIWI Universal Payment Protocol"
-msgstr "Универсальный платежный протокол QIWI"
+#. translators:
+#. ru_RU: Оплата через: VISA, MasterCard, МИР, Баланс телефона, QIWI Кошелек
+#.
+#: includes/class-gateway.php:91
+msgid "Payment over: VISA, MasterCard, MIR, Phone balance, QIWI Wallet"
+msgstr "Оплата через: VISA, MasterCard, МИР, Баланс телефона, QIWI Кошелек"
 
-#: includes/class-gateway.php:121
+#. translators:
+#. ru_RU: Оплата с банковских карт, QIWI Кошелька и баланса телефона. Гарантия безопасности ваших платежей.
+#.
+#: includes/class-gateway.php:97
+msgid ""
+"Payment from bank cards, QIWI Wallet and phone balance. Guaranteed security "
+"of your payments."
+msgstr ""
+"Оплата с банковских карт, QIWI кошелька и баланса телефона. Гарантированная "
+"безопасность ваших платежей."
+
+#. translators:
+#. ru_RU: Включение / выключение
+#.
+#: includes/class-gateway.php:208
 msgid "Turn On/off"
 msgstr "Включение / выключение"
 
-#: includes/class-gateway.php:123
-msgid "Activate the payment module for QIWI Universal Payment Protocol "
-msgstr ""
-"Активировать модуль оплаты для универсального платежного протокола QIWI "
+#. translators:
+#. ru_RU: Активировать модуль оплаты %1$s
+#. 1: Название модуля
+#.
+#: includes/class-gateway.php:215
+#, php-format
+msgid "Activate payment module %1$s"
+msgstr "Активировать модуль оплаты %1$s"
 
-#: includes/class-gateway.php:127
+#. translators:
+#. ru_RU: Заголовок
+#.
+#: includes/class-gateway.php:225
 msgid "Title"
-msgstr "Заголовок"
+msgstr "Название"
 
-#: includes/class-gateway.php:129
-msgid "The name that the user sees when selecting the payment type"
-msgstr "Имя, отображаемое клиентам при выборе типа платежа"
+#. translators:
+#. ru_RU: Название метода оплаты, отображаемое клиентам.
+#.
+#: includes/class-gateway.php:231
+msgid "The name of the payment method displayed to customers."
+msgstr "Название метода оплаты, отображаемого клиентам."
 
-#: includes/class-gateway.php:133
+#. translators:
+#. ru_RU: Описание
+#.
+#: includes/class-gateway.php:241
 msgid "Description"
 msgstr "Описание"
 
-#: includes/class-gateway.php:135
-msgid "Description that the user sees when selecting the payment type"
-msgstr "Описание, которое видит клиент при выборе типа оплаты"
+#. translators:
+#. ru_RU: Описание метода оплаты, отображаемое клиентам.
+#.
+#: includes/class-gateway.php:247
+msgid "Description of the payment method displayed to customers."
+msgstr "Описание способа оплаты, отображаемого клиентам."
 
-#: includes/class-gateway.php:139
+#. translators:
+#. ru_RU: Секретный ключ
+#.
+#: includes/class-gateway.php:257
 msgid "Secret key"
 msgstr "Секретный ключ"
 
-#: includes/class-gateway.php:141
-msgid "Key to authenticate your requests"
-msgstr "Ключ для аутентификации ваших запросов"
+#. translators:
+#. ru_RU: Ключ к платежной системе для вашего магазина.
+#.
+#: includes/class-gateway.php:263
+msgid "The key to the payment system for your store."
+msgstr "Ключ к платежной системе для вашего магазина."
 
-#: includes/class-gateway.php:144
-msgid "Notification URL"
-msgstr "URL-адрес уведомлений"
-
-#: includes/class-gateway.php:147
-msgid "Set the field in the store settings"
-msgstr "Задайте это значение в настройках магазина"
-
-#: includes/class-gateway.php:151
-msgid "Success URL"
-msgstr "URL успеха"
-
-#: includes/class-gateway.php:153
-msgid "Page transition on successful payment (successURL)"
-msgstr ""
-"Страница, на которую клиент перейдет после успешного платежа (successURL)"
-
-#: includes/class-gateway.php:155
-msgid "Page \"Order received\" from WooCommerce"
-msgstr "Страница \"заказ получен\" от WooCommerce"
-
-#: includes/class-gateway.php:156
-msgid "Checkout page from WooCommerce"
-msgstr "Страница оформления заказа из WooCommerce"
-
-#. translators: Take note of refund ID - a uuid v4 string.
-#: includes/class-gateway.php:196
-#, php-format
-msgid "Make refund ID # %1$s"
-msgstr "Сделан возврат ID # %1$s"
-
-#: includes/class-gateway.php:244
-msgid "Expected invoice payment notification."
-msgstr "Ожидается платежное уведомление."
-
-#: includes/class-gateway.php:257
-msgid "Invalid notification signature."
-msgstr "Недействительная подпись уведомления."
-
+#. translators:
+#. ru_RU: Адрес для уведомлений
+#.
 #: includes/class-gateway.php:272
-msgid "Order not found."
-msgstr "Заказ не найден."
+msgid "Notification address"
+msgstr "Адрес для уведомлений"
 
-#: includes/class-gateway.php:283
-msgid "Invoice rejected by customer."
-msgstr "Счет отклонен клиентом."
+#. translators:
+#. ru_RU: Установите это значение в настройках магазина платежной системы.
+#.
+#: includes/class-gateway.php:278
+msgid "Set this value in the payment system store settings."
+msgstr "Установите это значение в настройках магазина платежной системы."
 
-#: includes/class-gateway.php:286
-msgid "Error when making a payment. The bill is not paid."
-msgstr "Ошибка при совершении платежа. Счет не оплачен."
+#. translators:
+#. ru_RU: Выполнен возврат %1$s
+#. 1: ID транзакции
+#.
+#: includes/class-gateway.php:436
+#, php-format
+msgid "Completed refund  %1$s"
+msgstr "Завершение возврата %1$s"
 
-#: includes/class-gateway.php:289
-msgid "Payment session expired. The bill is not paid."
-msgstr "Платежная сессия истекла. Счет не оплачен."
-
-#: includes/class-gateway.php:292
-msgid "Order payment not done. Order status Unknown."
-msgstr "Оплата заказа не выполнена. Статус заказа неизвестен."
-
-#: includes/class-gateway.php:330
-msgid "Awaiting payment"
-msgstr "Ожидание оплаты"
+#. Author of the plugin/theme
+#: woocommerce-payment-qiwi.php:30 woocommerce-payment-qiwi.php:31
+msgid "QIWI"
+msgstr "QIWI"
 
 #. Plugin Name of the plugin/theme
 msgid "Woocommerce QIWI payment gateway"
