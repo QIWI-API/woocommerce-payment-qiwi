@@ -97,8 +97,8 @@ class Gateway extends WC_Payment_Gateway {
 		$this->supports = [ 'products', 'refunds' ];
 
 		// Setup icons.
-		$this->icon       = plugins_url( 'assets/payment.png', __DIR__ );
-		$this->title_icon = plugins_url( 'assets/qiwi.png', __DIR__ );
+		$this->icon       = plugins_url( 'assets/payments.svg', __DIR__ );
+		$this->title_icon = plugins_url( 'assets/logo_kassa.svg', __DIR__ );
 
 		// Setup readonly props.
 		$this->notification_url = site_url() . '/?wc-api=' . $this->id;
@@ -125,11 +125,11 @@ class Gateway extends WC_Payment_Gateway {
 		try {
 			$this->bill_payments = new BillPayments( $this->secret_key, $options );
 		} catch ( ErrorException $exception ) {
-			wc_add_wp_error_notices(new WP_Error(
+			wc_add_wp_error_notices( new WP_Error(
 				$exception->getCode(),
 				$exception->getMessage(),
 				$exception
-			));
+			) );
 		}
 
 		// Capture API callback.
@@ -147,6 +147,28 @@ class Gateway extends WC_Payment_Gateway {
 				filemtime( dirname( __DIR__ ) . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'qiwi.css' )
 			);
 		}
+	}
+
+	/**
+	 * Get method description.
+	 *
+	 * @return string
+	 */
+	public function get_method_description() {
+		$method_description = $this->method_description;
+
+		/*
+		 * translators:
+		 * ru_RU: Для начала работы с сервисом QIWI Касса необходима <a href="https://kassa.qiwi.com/" target="_blank">регистрация магазина</a>.
+		 */
+		$method_description .= PHP_EOL . __( 'To start working with the QIWI cash service, you need to <a href="https://kassa.qiwi.com/" target="_blank">register a store</a>.', 'woocommerce_payment_qiwi' );
+
+		/*
+		 * translators:
+		 * ru_RU: Так же, для вас доступен <a href="https://developer.qiwi.com/demo/" target="_blank">демонстрационный стенд</a>.
+		 */
+		$method_description .= PHP_EOL . __( 'Also, a <a href="https://kassa.qiwi.com/" target="_blank">demonstration stand</a> is available for you.', 'woocommerce_payment_qiwi' );
+		return apply_filters( 'woocommerce_gateway_method_description', $method_description, $this );
 	}
 
 	/**
@@ -168,7 +190,7 @@ class Gateway extends WC_Payment_Gateway {
 	 * @return string
 	 */
 	public function get_icon() {
-		$icon = $this->icon ? '<img src="' . WC_HTTPS::force_https_url( $this->icon ) . '" alt="' . esc_attr( $this->method_supports ) . '" />' : '';
+		$icon = $this->icon ? '<span><img src="' . WC_HTTPS::force_https_url( $this->icon ) . '" alt="' . esc_attr( $this->method_supports ) . '" /></span>' : '';
 		return apply_filters( 'woocommerce_gateway_icon', $icon, $this->id );
 	}
 
@@ -295,10 +317,10 @@ class Gateway extends WC_Payment_Gateway {
 		}
 
 		// Get order.
-		$orders = wc_get_orders([
+		$orders = wc_get_orders( [
 			'limit'          => 1,
 			'transaction_id' => $notice['bill']['billId'],
-		]);
+		] );
 		/**
 		 * The order.
 		 *
@@ -354,7 +376,7 @@ class Gateway extends WC_Payment_Gateway {
 					'email'              => $order->get_billing_email(),
 					'account'            => $order->get_user_id(),
 					'successUrl'         => $this->get_return_url( $order ),
-				]);
+				] );
 				$order->set_transaction_id( $bill_id );
 				$order->save();
 
@@ -369,11 +391,11 @@ class Gateway extends WC_Payment_Gateway {
 				$bill = $this->bill_payments->getBillInfo( $bill_id );
 			}
 		} catch ( Exception $exception ) {
-			wc_add_wp_error_notices(new WP_Error(
+			wc_add_wp_error_notices( new WP_Error(
 				$exception->getCode(),
 				$exception->getMessage(),
 				$exception
-			));
+			) );
 			return [ 'result' => 'fail' ];
 		}
 
@@ -423,7 +445,7 @@ class Gateway extends WC_Payment_Gateway {
 		switch ( $refund['status'] ) {
 			case 'PARTIAL':
 			case 'FULL':
-				$order->add_order_note(sprintf(
+				$order->add_order_note( sprintf(
 
 					/*
 					 * translators:
@@ -432,7 +454,7 @@ class Gateway extends WC_Payment_Gateway {
 					 */
 					__( 'Completed refund  %1$s', 'woocommerce_payment_qiwi' ),
 					$refund_id
-				));
+				) );
 				return true;
 		}
 		return false;

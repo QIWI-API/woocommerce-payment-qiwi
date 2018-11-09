@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 "Project-Id-Version: Woocommerce QIWI payment gateway\n"
-"POT-Creation-Date: 2018-11-08 19:11+0500\n"
+"POT-Creation-Date: 2018-11-09 15:52+0500\n"
 "PO-Revision-Date: 2018-10-29 17:40+0500\n"
 "Last-Translator: \n"
 "Language-Team: https://github.com/QIWI-API/woocommerce-payment-qiwi\n"
@@ -25,30 +25,48 @@ msgstr ""
 #. translators:
 #. ru_RU: QIWI Касса
 #.
-#: includes/class-gateway.php:85
-msgid "QIWI Сash"
+#: includes/class-gateway.php:82 woocommerce-payment-qiwi.php:38
+msgid "QIWI cash"
 msgstr ""
 
 #. translators:
 #. ru_RU: Оплата через: VISA, MasterCard, МИР, Баланс телефона, QIWI Кошелек
 #.
-#: includes/class-gateway.php:91
+#: includes/class-gateway.php:88
 msgid "Payment over: VISA, MasterCard, MIR, Phone balance, QIWI Wallet"
 msgstr ""
 
 #. translators:
 #. ru_RU: Оплата с банковских карт, QIWI Кошелька и баланса телефона. Гарантия безопасности ваших платежей.
 #.
-#: includes/class-gateway.php:97
+#: includes/class-gateway.php:94
 msgid ""
 "Payment from bank cards, QIWI Wallet and phone balance. Guaranteed "
 "security of your payments."
 msgstr ""
 
 #. translators:
+#. ru_RU: Для начала работы с сервисом QIWI Касса необходима <a href="https://kassa.qiwi.com/" target="_blank">регистрация магазина</a>.
+#.
+#: includes/class-gateway.php:164
+msgid ""
+"To start working with the QIWI cash service, you need to <a href=\"https://"
+"kassa.qiwi.com/\" target=\"_blank\">register a store</a>."
+msgstr ""
+
+#. translators:
+#. ru_RU: Так же, для вас доступен <a href="https://developer.qiwi.com/demo/" target="_blank">демонстрационный стенд</a>.
+#.
+#: includes/class-gateway.php:170
+msgid ""
+"Also, a <a href=\"https://kassa.qiwi.com/\" target=\"_blank"
+"\">demonstration stand</a> is available for you."
+msgstr ""
+
+#. translators:
 #. ru_RU: Включение / выключение
 #.
-#: includes/class-gateway.php:208
+#: includes/class-gateway.php:227
 msgid "Turn On/off"
 msgstr ""
 
@@ -56,7 +74,7 @@ msgstr ""
 #. ru_RU: Активировать модуль оплаты %1$s
 #. 1: Название модуля
 #.
-#: includes/class-gateway.php:215
+#: includes/class-gateway.php:234
 #, php-format
 msgid "Activate payment module %1$s"
 msgstr ""
@@ -64,56 +82,56 @@ msgstr ""
 #. translators:
 #. ru_RU: Заголовок
 #.
-#: includes/class-gateway.php:225
+#: includes/class-gateway.php:244
 msgid "Title"
 msgstr ""
 
 #. translators:
 #. ru_RU: Название метода оплаты, отображаемое клиентам.
 #.
-#: includes/class-gateway.php:231
+#: includes/class-gateway.php:250
 msgid "The name of the payment method displayed to customers."
 msgstr ""
 
 #. translators:
 #. ru_RU: Описание
 #.
-#: includes/class-gateway.php:241
+#: includes/class-gateway.php:260
 msgid "Description"
 msgstr ""
 
 #. translators:
 #. ru_RU: Описание метода оплаты, отображаемое клиентам.
 #.
-#: includes/class-gateway.php:247
+#: includes/class-gateway.php:266
 msgid "Description of the payment method displayed to customers."
 msgstr ""
 
 #. translators:
 #. ru_RU: Секретный ключ
 #.
-#: includes/class-gateway.php:257
+#: includes/class-gateway.php:276
 msgid "Secret key"
 msgstr ""
 
 #. translators:
 #. ru_RU: Ключ к платежной системе для вашего магазина.
 #.
-#: includes/class-gateway.php:263
+#: includes/class-gateway.php:282
 msgid "The key to the payment system for your store."
 msgstr ""
 
 #. translators:
 #. ru_RU: Адрес для уведомлений
 #.
-#: includes/class-gateway.php:272
+#: includes/class-gateway.php:291
 msgid "Notification address"
 msgstr ""
 
 #. translators:
 #. ru_RU: Установите это значение в настройках магазина платежной системы.
 #.
-#: includes/class-gateway.php:278
+#: includes/class-gateway.php:297
 msgid "Set this value in the payment system store settings."
 msgstr ""
 
@@ -121,14 +139,9 @@ msgstr ""
 #. ru_RU: Выполнен возврат %1$s
 #. 1: ID транзакции
 #.
-#: includes/class-gateway.php:436
+#: includes/class-gateway.php:455
 #, php-format
 msgid "Completed refund  %1$s"
-msgstr ""
-
-#. Author of the plugin/theme
-#: woocommerce-payment-qiwi.php:30 woocommerce-payment-qiwi.php:31
-msgid "QIWI"
 msgstr ""
 
 #. Plugin Name of the plugin/theme
@@ -141,6 +154,10 @@ msgstr ""
 
 #. Description of the plugin/theme
 msgid "QIWI universal payment API integration for Woocommerce"
+msgstr ""
+
+#. Author of the plugin/theme
+msgid "QIWI"
 msgstr ""
 
 #. Author URI of the plugin/theme

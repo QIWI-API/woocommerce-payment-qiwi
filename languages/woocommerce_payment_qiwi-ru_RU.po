@@ -1,16 +1,14 @@
 msgid ""
 msgstr ""
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
 "Project-Id-Version: Woocommerce QIWI payment gateway\n"
-"POT-Creation-Date: 2018-11-08 19:12+0500\n"
-"PO-Revision-Date: 2018-11-08 19:15+0500\n"
-"Last-Translator: \n"
+"POT-Creation-Date: 2018-11-09 15:52+0500\n"
+"PO-Revision-Date: 2018-11-09 15:53+0500\n"
 "Language-Team: https://github.com/QIWI-API/woocommerce-payment-qiwi\n"
-"Language: ru_RU\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
 "X-Generator: Poedit 2.2\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-Flags-xgettext: --add-comments=translators:\n"
@@ -19,6 +17,8 @@ msgstr ""
 "X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
 "esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;"
 "_n_noop:1,2;_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
+"Last-Translator: \n"
+"Language: ru_RU\n"
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPathExcluded-0: *.js\n"
 "X-Poedit-SearchPathExcluded-1: vendor\n"
@@ -26,21 +26,21 @@ msgstr ""
 #. translators:
 #. ru_RU: QIWI Касса
 #.
-#: includes/class-gateway.php:85
-msgid "QIWI Сash"
+#: includes/class-gateway.php:82 woocommerce-payment-qiwi.php:38
+msgid "QIWI cash"
 msgstr "QIWI Касса"
 
 #. translators:
 #. ru_RU: Оплата через: VISA, MasterCard, МИР, Баланс телефона, QIWI Кошелек
 #.
-#: includes/class-gateway.php:91
+#: includes/class-gateway.php:88
 msgid "Payment over: VISA, MasterCard, MIR, Phone balance, QIWI Wallet"
 msgstr "Оплата через: VISA, MasterCard, МИР, Баланс телефона, QIWI Кошелек"
 
 #. translators:
 #. ru_RU: Оплата с банковских карт, QIWI Кошелька и баланса телефона. Гарантия безопасности ваших платежей.
 #.
-#: includes/class-gateway.php:97
+#: includes/class-gateway.php:94
 msgid ""
 "Payment from bank cards, QIWI Wallet and phone balance. Guaranteed security "
 "of your payments."
@@ -49,9 +49,31 @@ msgstr ""
 "безопасность ваших платежей."
 
 #. translators:
+#. ru_RU: Для начала работы с сервисом QIWI Касса необходима <a href="https://kassa.qiwi.com/" target="_blank">регистрация магазина</a>.
+#.
+#: includes/class-gateway.php:164
+msgid ""
+"To start working with the QIWI cash service, you need to <a href=\"https://"
+"kassa.qiwi.com/\" target=\"_blank\">register a store</a>."
+msgstr ""
+"Для начала работы с сервисом QIWI Касса необходима <a href=\"https://kassa."
+"qiwi.com/\" target=\"_blank\">регистрация магазина</a>."
+
+#. translators:
+#. ru_RU: Так же, для вас доступен <a href="https://developer.qiwi.com/demo/" target="_blank">демонстрационный стенд</a>.
+#.
+#: includes/class-gateway.php:170
+msgid ""
+"Also, a <a href=\"https://kassa.qiwi.com/\" target=\"_blank\">demonstration "
+"stand</a> is available for you."
+msgstr ""
+"Так же, для вас доступен <a href=\"https://developer.qiwi.com/demo/\" "
+"target=\"_blank\">демонстрационный стенд</a>."
+
+#. translators:
 #. ru_RU: Включение / выключение
 #.
-#: includes/class-gateway.php:208
+#: includes/class-gateway.php:227
 msgid "Turn On/off"
 msgstr "Включение / выключение"
 
@@ -59,7 +81,7 @@ msgstr "Включение / выключение"
 #. ru_RU: Активировать модуль оплаты %1$s
 #. 1: Название модуля
 #.
-#: includes/class-gateway.php:215
+#: includes/class-gateway.php:234
 #, php-format
 msgid "Activate payment module %1$s"
 msgstr "Активировать модуль оплаты %1$s"
@@ -67,56 +89,56 @@ msgstr "Активировать модуль оплаты %1$s"
 #. translators:
 #. ru_RU: Заголовок
 #.
-#: includes/class-gateway.php:225
+#: includes/class-gateway.php:244
 msgid "Title"
 msgstr "Название"
 
 #. translators:
 #. ru_RU: Название метода оплаты, отображаемое клиентам.
 #.
-#: includes/class-gateway.php:231
+#: includes/class-gateway.php:250
 msgid "The name of the payment method displayed to customers."
 msgstr "Название метода оплаты, отображаемого клиентам."
 
 #. translators:
 #. ru_RU: Описание
 #.
-#: includes/class-gateway.php:241
+#: includes/class-gateway.php:260
 msgid "Description"
 msgstr "Описание"
 
 #. translators:
 #. ru_RU: Описание метода оплаты, отображаемое клиентам.
 #.
-#: includes/class-gateway.php:247
+#: includes/class-gateway.php:266
 msgid "Description of the payment method displayed to customers."
 msgstr "Описание способа оплаты, отображаемого клиентам."
 
 #. translators:
 #. ru_RU: Секретный ключ
 #.
-#: includes/class-gateway.php:257
+#: includes/class-gateway.php:276
 msgid "Secret key"
 msgstr "Секретный ключ"
 
 #. translators:
 #. ru_RU: Ключ к платежной системе для вашего магазина.
 #.
-#: includes/class-gateway.php:263
+#: includes/class-gateway.php:282
 msgid "The key to the payment system for your store."
 msgstr "Ключ к платежной системе для вашего магазина."
 
 #. translators:
 #. ru_RU: Адрес для уведомлений
 #.
-#: includes/class-gateway.php:272
+#: includes/class-gateway.php:291
 msgid "Notification address"
 msgstr "Адрес для уведомлений"
 
 #. translators:
 #. ru_RU: Установите это значение в настройках магазина платежной системы.
 #.
-#: includes/class-gateway.php:278
+#: includes/class-gateway.php:297
 msgid "Set this value in the payment system store settings."
 msgstr "Установите это значение в настройках магазина платежной системы."
 
@@ -124,15 +146,10 @@ msgstr "Установите это значение в настройках м�
 #. ru_RU: Выполнен возврат %1$s
 #. 1: ID транзакции
 #.
-#: includes/class-gateway.php:436
+#: includes/class-gateway.php:455
 #, php-format
 msgid "Completed refund  %1$s"
 msgstr "Завершение возврата %1$s"
-
-#. Author of the plugin/theme
-#: woocommerce-payment-qiwi.php:30 woocommerce-payment-qiwi.php:31
-msgid "QIWI"
-msgstr "QIWI"
 
 #. Plugin Name of the plugin/theme
 msgid "Woocommerce QIWI payment gateway"
@@ -145,6 +162,10 @@ msgstr "https://github.com/QIWI-API/woocommerce-payment-qiwi"
 #. Description of the plugin/theme
 msgid "QIWI universal payment API integration for Woocommerce"
 msgstr "Интеграция Универсального платежного протокола QIWI для Woocommerce"
+
+#. Author of the plugin/theme
+msgid "QIWI"
+msgstr "QIWI"
 
 #. Author URI of the plugin/theme
 msgid "https://qiwi.com/"
