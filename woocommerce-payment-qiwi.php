@@ -17,22 +17,29 @@
 
 defined( 'ABSPATH' ) || exit;
 
+// On Woocommerce ready.
 add_action( 'woocommerce_init', function () {
+	// Autoload.
 	if ( file_exists( __DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php' ) ) {
 		include_once __DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 	} else {
 		include_once __DIR__ . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'class-gateway.php';
 	}
+
+	// Translations.
 	load_plugin_textdomain( 'woocommerce_payment_qiwi', false, basename( __DIR__ ) . DIRECTORY_SEPARATOR . 'languages' );
-	add_action('admin_menu', function () {
-		add_submenu_page(
-			'woocommerce',
-			__( 'QIWI', 'woocommerce_payment_qiwi' ),
-			__( 'QIWI', 'woocommerce_payment_qiwi' ),
-			'manage_woocommerce',
-			'admin.php?page=wc-settings&tab=checkout&section=qiwi'
-		);
-	}, 51);
+
+	// Add menu link.
+	add_action( 'admin_menu', function () {
+		/*
+		 * translators:
+		 * ru_RU: QIWI Касса
+		 */
+		$title = __( 'QIWI cash', 'woocommerce_payment_qiwi' );
+		add_submenu_page( 'woocommerce', $title, $title, 'manage_woocommerce', 'admin.php?page=wc-settings&tab=checkout&section=qiwi' );
+	}, 51 );
+
+	// Add gateway.
 	add_filter( 'woocommerce_payment_gateways', function ( $methods ) {
 		$methods[] = \Qiwi\Payment\Gateway::class;
 		return $methods;
