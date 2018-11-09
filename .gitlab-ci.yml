@@ -17,6 +17,7 @@ cache:
 build_test:
   stage: build_test
   script:
+  - composer clearcache
   - composer install --no-progress --no-interaction
   artifacts:
     paths:
