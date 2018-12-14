@@ -3,7 +3,7 @@
  * Plugin Name: Woocommerce QIWI payment gateway
  * Plugin URI:  https://github.com/QIWI-API/woocommerce-payment-qiwi
  * Description: QIWI universal payment API integration for Woocommerce
- * Version:     0.0.1
+ * Version:     0.0.2
  * Author:      QIWI
  * Author URI:  https://qiwi.com/
  * License:     MIT
@@ -19,27 +19,55 @@ defined( 'ABSPATH' ) || exit;
 
 // On Woocommerce ready.
 add_action( 'woocommerce_init', function () {
-	// Translations.
-	load_plugin_textdomain( 'woocommerce_payment_qiwi', false, basename( __DIR__ ) . DIRECTORY_SEPARATOR . 'languages' );
 
-	// Composer autoload.
+	// Require plugin function's.
+	if ( ! function_exists( 'get_plugin_data' ) ) {
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+	}
+
+	/**
+	 * Plugin data.
+	 *
+	 * @var array $data
+	 */
+	$data = get_plugin_data( __FILE__, true, true );
+
+	// Translations.
+	load_plugin_textdomain( 'woocommerce_payment_qiwi', false, basename( __DIR__ ) . $data['DomainPath'] );
+
+	/**
+	 * The client name.
+	 *
+	 * @var string CLIENT_NAME
+	 */
+	if ( ! defined( 'CLIENT_NAME' ) ) {
+		define( 'CLIENT_NAME', 'WordPress Woccomerce' );
+	}
+
+	/**
+	 * The client version.
+	 *
+	 * @var string CLIENT_VERSION
+	 */
+	if ( ! defined( 'CLIENT_VERSION' ) ) {
+		define( 'CLIENT_VERSION', $data['Version'] );
+	}
+
+	// Autoload for standalone composer build or composer's WordPress instalations.
 	if ( file_exists( __DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php' ) ) {
 		include_once __DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
-	}
-	// if it's composer wordpress instalations.
-	else if ( class_exists( 'Qiwi\Api\BillPayments' ) ) {
+	} elseif ( class_exists( 'Qiwi\Api\BillPayments' ) ) {
 		include_once __DIR__ . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'class-gateway.php';
 	}
 
-	// Ready for use.
-	if ( class_exists( 'Qiwi\Payment\Gateway' ) )
-	{
+	// Ready for use or noticie broken installation.
+	if ( class_exists( 'Qiwi\Payment\Gateway' ) ) {
 		// Add menu link.
 		add_action( 'admin_menu', function () {
 			/*
-             * translators:
-             * ru_RU: QIWI Касса
-             */
+			 * translators:
+			 * ru_RU: QIWI Касса
+			 */
 			$title = __( 'QIWI cash', 'woocommerce_payment_qiwi' );
 			add_submenu_page( 'woocommerce', $title, $title, 'manage_woocommerce', 'admin.php?page=wc-settings&tab=checkout&section=qiwi' );
 		}, 51 );
@@ -49,23 +77,20 @@ add_action( 'woocommerce_init', function () {
 			$methods[] = \Qiwi\Payment\Gateway::class;
 			return $methods;
 		} );
-	}
-	// Broken installation.
-	else {
-		add_action( 'admin_notices', function () {
-			/** @var array $data Plugin data. */
-			$data = get_plugin_data( __FILE__, true, true );
-			/*
-             * translators:
-             * ru_RU: <div class="error"><p><strong>Ошибка:</strong> плагин «%1$s» установлен неправильно.</p><p>Пожалуйста, ознакомьтесь с инструкциями по <a href="%2$s" target="_blank">установке в ручную</a>.</p></div>
-			 * %1$s: Localised plugin name
-			 * %2$s: URL to instalation manual
-             */
+	} else {
+		add_action( 'admin_notices', function () use ( $data ) {
 			printf(
+
+				/*
+				 * translators:
+				 * ru_RU: <div class="error"><p><strong>Ошибка:</strong> плагин «%1$s» установлен неправильно.</p><p>Пожалуйста, ознакомьтесь с инструкциями по <a href="%2$s" target="_blank">установке в ручную</a>.</p></div>
+				 * %1$s: Localised plugin name
+				 * %2$s: URL to instalation manual
+				 */
 				__( '<div class="error"><p><strong>Error:</strong> Plugin "%1$s" is not installed correctly.</p><p>Please, see instructions for <a href="%2$s" target="_blank">manual instalation</a>.</p></div>', 'woocommerce_payment_qiwi' ),
-				$data['Name'],
-				$data['PluginURI'] . '#manual-installation'
-			);
+				esc_html( $data['Name'] ),
+				esc_url( $data['PluginURI'] . '#manual-installation' )
+			); // WPCS: XSS OK.
 		} );
 	}
 

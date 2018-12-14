@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 "Project-Id-Version: Woocommerce QIWI payment gateway\n"
-"POT-Creation-Date: 2018-11-23 13:44+0500\n"
+"POT-Creation-Date: 2018-12-14 12:28+0500\n"
 "PO-Revision-Date: 2018-10-29 17:40+0500\n"
 "Last-Translator: \n"
 "Language-Team: https://github.com/QIWI-API/woocommerce-payment-qiwi\n"
@@ -25,7 +25,7 @@ msgstr ""
 #. translators:
 #. ru_RU: QIWI Касса
 #.
-#: includes/class-gateway.php:82 woocommerce-payment-qiwi.php:43
+#: includes/class-gateway.php:82 woocommerce-payment-qiwi.php:71
 msgid "QIWI cash"
 msgstr ""
 
@@ -144,7 +144,12 @@ msgstr ""
 msgid "Completed refund  %1$s"
 msgstr ""
 
-#: woocommerce-payment-qiwi.php:65
+#. translators:
+#. ru_RU: <div class="error"><p><strong>Ошибка:</strong> плагин «%1$s» установлен неправильно.</p><p>Пожалуйста, ознакомьтесь с инструкциями по <a href="%2$s" target="_blank">установке в ручную</a>.</p></div>
+#. %1$s: Localised plugin name
+#. %2$s: URL to instalation manual
+#.
+#: woocommerce-payment-qiwi.php:90
 #, php-format
 msgid ""
 "<div class=\"error\"><p><strong>Error:</strong> Plugin \"%1$s\" is not "
