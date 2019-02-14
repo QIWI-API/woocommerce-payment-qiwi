@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "b1e7c4b0bb6640bccf594140362bf23b",
+    "content-hash": "6914a0681878f43c292f7e5192c7a861",
     "packages": [
         {
             "name": "composer/installers",
@@ -228,28 +228,29 @@
         },
         {
             "name": "qiwi/bill-payments-php-sdk",
-            "version": "0.0.1",
+            "version": "0.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/QIWI-API/bill-payments-php-sdk.git",
-                "reference": "caf23308c5c6b52705c3295deb97745b95db2898"
+                "reference": "c91a8b0608714dcf32fb14fa2e818f9ff7ed021b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/QIWI-API/bill-payments-php-sdk/zipball/caf23308c5c6b52705c3295deb97745b95db2898",
-                "reference": "caf23308c5c6b52705c3295deb97745b95db2898",
+                "url": "https://api.github.com/repos/QIWI-API/bill-payments-php-sdk/zipball/c91a8b0608714dcf32fb14fa2e818f9ff7ed021b",
+                "reference": "c91a8b0608714dcf32fb14fa2e818f9ff7ed021b",
                 "shasum": ""
             },
             "require": {
-                "curl/curl": "^1.9",
+                "curl/curl": "1.9.*",
                 "ext-curl": "*",
                 "ext-json": "*",
-                "php": ">=5.5.0",
-                "ramsey/uuid": "^3.8"
+                "php": ">=5.6.0",
+                "ramsey/uuid": "3.8.*"
             },
             "require-dev": {
-                "phpdocumentor/phpdocumentor": "*",
-                "phpunit/phpunit": "4.8.36"
+                "phpdocumentor/phpdocumentor": "2.8.*",
+                "phpunit/phpunit": "5.7.27",
+                "squizlabs/php_codesniffer": "3.4.*"
             },
             "type": "library",
             "autoload": {
@@ -263,7 +264,7 @@
             ],
             "description": "Universal payments API SDK",
             "homepage": "https://github.com/QIWI-API/bill-payments-php-sdk",
-            "time": "2018-10-23T10:00:56+00:00"
+            "time": "2019-01-24T08:49:29+00:00"
         },
         {
             "name": "ramsey/uuid",
@@ -407,16 +408,16 @@
         },
         {
             "name": "woocommerce/woocommerce",
-            "version": "3.5.2",
+            "version": "3.5.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/woocommerce/woocommerce.git",
-                "reference": "5dcd8a1d5fa7b7b41463f956d23e69490a20297c"
+                "reference": "5aba07ee73b8fbd615467ae6f075291b185159ae"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/woocommerce/woocommerce/zipball/5dcd8a1d5fa7b7b41463f956d23e69490a20297c",
-                "reference": "5dcd8a1d5fa7b7b41463f956d23e69490a20297c",
+                "url": "https://api.github.com/repos/woocommerce/woocommerce/zipball/5aba07ee73b8fbd615467ae6f075291b185159ae",
+                "reference": "5aba07ee73b8fbd615467ae6f075291b185159ae",
                 "shasum": ""
             },
             "require": {
@@ -447,7 +448,7 @@
             ],
             "description": "An eCommerce toolkit that helps you sell anything. Beautifully.",
             "homepage": "https://woocommerce.com/",
-            "time": "2018-11-29T16:46:52+00:00"
+            "time": "2019-01-21T18:02:01+00:00"
         }
     ],
     "packages-dev": [
@@ -2074,16 +2075,16 @@
         },
         {
             "name": "squizlabs/php_codesniffer",
-            "version": "3.3.2",
+            "version": "3.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
-                "reference": "6ad28354c04b364c3c71a34e4a18b629cc3b231e"
+                "reference": "379deb987e26c7cd103a7b387aea178baec96e48"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/6ad28354c04b364c3c71a34e4a18b629cc3b231e",
-                "reference": "6ad28354c04b364c3c71a34e4a18b629cc3b231e",
+                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/379deb987e26c7cd103a7b387aea178baec96e48",
+                "reference": "379deb987e26c7cd103a7b387aea178baec96e48",
                 "shasum": ""
             },
             "require": {
@@ -2121,7 +2122,7 @@
                 "phpcs",
                 "standards"
             ],
-            "time": "2018-09-23T23:08:17+00:00"
+            "time": "2018-12-19T23:57:18+00:00"
         },
         {
             "name": "symfony/config",
@@ -2753,31 +2754,31 @@
         },
         {
             "name": "twig/twig",
-            "version": "v1.35.4",
+            "version": "v1.37.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/Twig.git",
-                "reference": "7e081e98378a1e78c29cc9eba4aefa5d78a05d2a"
+                "reference": "66be9366c76cbf23e82e7171d47cbfa54a057a62"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/Twig/zipball/7e081e98378a1e78c29cc9eba4aefa5d78a05d2a",
-                "reference": "7e081e98378a1e78c29cc9eba4aefa5d78a05d2a",
+                "url": "https://api.github.com/repos/twigphp/Twig/zipball/66be9366c76cbf23e82e7171d47cbfa54a057a62",
+                "reference": "66be9366c76cbf23e82e7171d47cbfa54a057a62",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.3",
+                "php": ">=5.4.0",
                 "symfony/polyfill-ctype": "^1.8"
             },
             "require-dev": {
                 "psr/container": "^1.0",
                 "symfony/debug": "^2.7",
-                "symfony/phpunit-bridge": "^3.3"
+                "symfony/phpunit-bridge": "^3.4.19|^4.1.8"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.35-dev"
+                    "dev-master": "1.37-dev"
                 }
             },
             "autoload": {
@@ -2815,7 +2816,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2018-07-13T07:12:17+00:00"
+            "time": "2019-01-14T14:59:29+00:00"
         },
         {
             "name": "wimg/php-compatibility",
@@ -3106,16 +3107,16 @@
         },
         {
             "name": "zendframework/zend-filter",
-            "version": "2.9.0",
+            "version": "2.9.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zendframework/zend-filter.git",
-                "reference": "875da9790e5cb16b9a12f41453d5f7c441452daf"
+                "reference": "1c3e6d02f9cd5f6c929c9859498f5efbe216e86f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/zend-filter/zipball/875da9790e5cb16b9a12f41453d5f7c441452daf",
-                "reference": "875da9790e5cb16b9a12f41453d5f7c441452daf",
+                "url": "https://api.github.com/repos/zendframework/zend-filter/zipball/1c3e6d02f9cd5f6c929c9859498f5efbe216e86f",
+                "reference": "1c3e6d02f9cd5f6c929c9859498f5efbe216e86f",
                 "shasum": ""
             },
             "require": {
@@ -3167,7 +3168,7 @@
                 "filter",
                 "zf"
             ],
-            "time": "2018-12-12T23:14:25+00:00"
+            "time": "2018-12-17T16:00:04+00:00"
         },
         {
             "name": "zendframework/zend-hydrator",

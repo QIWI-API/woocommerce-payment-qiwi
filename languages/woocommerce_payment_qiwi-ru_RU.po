@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Woocommerce QIWI payment gateway\n"
-"POT-Creation-Date: 2018-12-14 12:28+0500\n"
-"PO-Revision-Date: 2018-12-14 12:28+0500\n"
+"POT-Creation-Date: 2019-02-14 18:53+0500\n"
+"PO-Revision-Date: 2019-02-14 18:55+0500\n"
 "Last-Translator: \n"
 "Language-Team: https://github.com/QIWI-API/woocommerce-payment-qiwi\n"
 "Language: ru_RU\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
-"X-Generator: Poedit 2.2\n"
+"X-Generator: Poedit 2.2.1\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-Flags-xgettext: --add-comments=translators:\n"
 "X-Poedit-WPHeader: woocommerce-payment-qiwi.php\n"
@@ -143,10 +143,28 @@ msgid "Set this value in the payment system store settings."
 msgstr "Установите это значение в настройках магазина платежной системы."
 
 #. translators:
+#. ru_RU: Код стиля
+#.
+#: includes/class-gateway.php:308
+msgid "Theme style code"
+msgstr "Код стиля"
+
+#. translators:
+#. ru_RU: Код персонализации стиля платежной формы полученный в настройках магазина платежной системы.
+#.
+#: includes/class-gateway.php:314
+msgid ""
+"Personalization code of the payment form style is presented in the payment "
+"system store settings."
+msgstr ""
+"Код персонализации стиля платежной формы полученный в настройках магазина "
+"платежной системы."
+
+#. translators:
 #. ru_RU: Выполнен возврат %1$s
 #. 1: ID транзакции
 #.
-#: includes/class-gateway.php:455
+#: includes/class-gateway.php:473
 #, php-format
 msgid "Completed refund  %1$s"
 msgstr "Завершение возврата %1$s"
