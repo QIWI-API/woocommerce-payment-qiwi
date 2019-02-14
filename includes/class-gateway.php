@@ -299,6 +299,21 @@ class Gateway extends WC_Payment_Gateway {
 				'disabled'    => true,
 				'default'     => $this->notification_url,
 			],
+			'theme_code'       => [
+
+				/*
+				 * translators:
+				 * ru_RU: Код стиля
+				 */
+				'title'       => __( 'Theme style code', 'woocommerce_payment_qiwi' ),
+
+				/*
+				 * translators:
+				 * ru_RU: Код персонализации стиля платежной формы полученный в настройках магазина платежной системы.
+				 */
+				'description' => __( 'Personalization code of the payment form style is presented in the payment system store settings.', 'woocommerce_payment_qiwi' ),
+				'type'        => 'text',
+			],
 		];
 	}
 
@@ -376,6 +391,9 @@ class Gateway extends WC_Payment_Gateway {
 					'email'              => $order->get_billing_email(),
 					'account'            => $order->get_user_id(),
 					'successUrl'         => $this->get_return_url( $order ),
+					'customFields'       => array_filter([
+						'themeCode' => $this->get_option( 'theme_code' ),
+					]),
 				] );
 				$order->set_transaction_id( $bill_id );
 				$order->save();
