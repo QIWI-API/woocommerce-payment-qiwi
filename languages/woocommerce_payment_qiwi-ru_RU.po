@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Woocommerce QIWI payment gateway\n"
-"POT-Creation-Date: 2019-02-14 18:53+0500\n"
-"PO-Revision-Date: 2019-02-14 18:55+0500\n"
+"POT-Creation-Date: 2019-04-10 14:58+0500\n"
+"PO-Revision-Date: 2019-04-10 14:58+0500\n"
 "Last-Translator: \n"
 "Language-Team: https://github.com/QIWI-API/woocommerce-payment-qiwi\n"
 "Language: ru_RU\n"
@@ -51,7 +51,7 @@ msgstr ""
 #. translators:
 #. ru_RU: Для начала работы с сервисом QIWI Касса необходима <a href="https://kassa.qiwi.com/" target="_blank">регистрация магазина</a>.
 #.
-#: includes/class-gateway.php:164
+#: includes/class-gateway.php:167
 msgid ""
 "To start working with the QIWI cash service, you need to <a href=\"https://"
 "kassa.qiwi.com/\" target=\"_blank\">register a store</a>."
@@ -62,7 +62,7 @@ msgstr ""
 #. translators:
 #. ru_RU: Так же, для вас доступен <a href="https://developer.qiwi.com/demo/" target="_blank">демонстрационный стенд</a>.
 #.
-#: includes/class-gateway.php:170
+#: includes/class-gateway.php:173
 msgid ""
 "Also, a <a href=\"https://kassa.qiwi.com/\" target=\"_blank\">demonstration "
 "stand</a> is available for you."
@@ -73,7 +73,7 @@ msgstr ""
 #. translators:
 #. ru_RU: Включение / выключение
 #.
-#: includes/class-gateway.php:227
+#: includes/class-gateway.php:246
 msgid "Turn On/off"
 msgstr "Включение / выключение"
 
@@ -81,7 +81,7 @@ msgstr "Включение / выключение"
 #. ru_RU: Активировать модуль оплаты %1$s
 #. 1: Название модуля
 #.
-#: includes/class-gateway.php:234
+#: includes/class-gateway.php:253
 #, php-format
 msgid "Activate payment module %1$s"
 msgstr "Активировать модуль оплаты %1$s"
@@ -89,70 +89,70 @@ msgstr "Активировать модуль оплаты %1$s"
 #. translators:
 #. ru_RU: Заголовок
 #.
-#: includes/class-gateway.php:244
+#: includes/class-gateway.php:263
 msgid "Title"
 msgstr "Название"
 
 #. translators:
 #. ru_RU: Название метода оплаты, отображаемое клиентам.
 #.
-#: includes/class-gateway.php:250
+#: includes/class-gateway.php:269
 msgid "The name of the payment method displayed to customers."
 msgstr "Название метода оплаты, отображаемого клиентам."
 
 #. translators:
 #. ru_RU: Описание
 #.
-#: includes/class-gateway.php:260
+#: includes/class-gateway.php:279
 msgid "Description"
 msgstr "Описание"
 
 #. translators:
 #. ru_RU: Описание метода оплаты, отображаемое клиентам.
 #.
-#: includes/class-gateway.php:266
+#: includes/class-gateway.php:285
 msgid "Description of the payment method displayed to customers."
 msgstr "Описание способа оплаты, отображаемого клиентам."
 
 #. translators:
 #. ru_RU: Секретный ключ
 #.
-#: includes/class-gateway.php:276
+#: includes/class-gateway.php:295
 msgid "Secret key"
 msgstr "Секретный ключ"
 
 #. translators:
 #. ru_RU: Ключ к платежной системе для вашего магазина.
 #.
-#: includes/class-gateway.php:282
+#: includes/class-gateway.php:301
 msgid "The key to the payment system for your store."
 msgstr "Ключ к платежной системе для вашего магазина."
 
 #. translators:
 #. ru_RU: Адрес для уведомлений
 #.
-#: includes/class-gateway.php:291
+#: includes/class-gateway.php:310
 msgid "Notification address"
 msgstr "Адрес для уведомлений"
 
 #. translators:
 #. ru_RU: Установите это значение в настройках магазина платежной системы.
 #.
-#: includes/class-gateway.php:297
+#: includes/class-gateway.php:316
 msgid "Set this value in the payment system store settings."
 msgstr "Установите это значение в настройках магазина платежной системы."
 
 #. translators:
 #. ru_RU: Код стиля
 #.
-#: includes/class-gateway.php:308
+#: includes/class-gateway.php:327
 msgid "Theme style code"
 msgstr "Код стиля"
 
 #. translators:
 #. ru_RU: Код персонализации стиля платежной формы полученный в настройках магазина платежной системы.
 #.
-#: includes/class-gateway.php:314
+#: includes/class-gateway.php:333
 msgid ""
 "Personalization code of the payment form style is presented in the payment "
 "system store settings."
@@ -164,7 +164,7 @@ msgstr ""
 #. ru_RU: Выполнен возврат %1$s
 #. 1: ID транзакции
 #.
-#: includes/class-gateway.php:473
+#: includes/class-gateway.php:492
 #, php-format
 msgid "Completed refund  %1$s"
 msgstr "Завершение возврата %1$s"

@@ -135,6 +135,9 @@ class Gateway extends WC_Payment_Gateway {
 		// Capture API callback.
 		add_action( "woocommerce_api_{$this->id}", [ $this, 'woocommerce_api' ] );
 
+		// Prevent logo escape
+		add_filter('esc_html', [ $this, 'title_esc_html' ], 50, 2);
+
 		if ( is_admin() ) {
 			// Capture options change.
 			add_action( "woocommerce_update_options_payment_gateways_{$this->id}", [ $this, 'process_admin_options' ] );
@@ -182,6 +185,22 @@ class Gateway extends WC_Payment_Gateway {
 		}
 		$title = $this->icon ? '<img src="' . WC_HTTPS::force_https_url( $this->title_icon ) . '" alt="' . esc_attr( $this->title ) . '" class="qiwi" />' : '';
 		return apply_filters( 'woocommerce_gateway_title', $title, $this->id );
+	}
+
+	/**
+	 * Return title unescaped always.
+	 *
+	 * @param $safe_text
+	 * @param $text
+	 *
+	 * @return mixed
+	 */
+	public function title_esc_html( $safe_text, $text ) {
+		static $title_text;
+		if ( is_null( $title_text ) ) {
+			$title_text = $this->get_title();
+		}
+		return $text == $title_text ? $text : $safe_text;
 	}
 
 	/**
