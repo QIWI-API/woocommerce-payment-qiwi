@@ -72,6 +72,34 @@ class Gateway extends WC_Payment_Gateway {
 	protected $title_icon;
 
 	/**
+	 * The use HTML flag.
+	 *
+	 * @var bool
+	 */
+	protected $use_html;
+
+	/**
+	 * The title icon HTML.
+	 *
+	 * @var string
+	 */
+	protected $title_icon_html;
+
+	/**
+	 * The icon HTML.
+	 *
+	 * @var string
+	 */
+	protected $icon_html;
+
+	/**
+	 * The method description HTML.
+	 *
+	 * @var string
+	 */
+	protected $method_description_html;
+
+	/**
 	 * Gateway constructor.
 	 */
 	public function __construct() {
@@ -109,8 +137,26 @@ class Gateway extends WC_Payment_Gateway {
 
 		// Set up from options.
 		$this->title       = $this->get_option( 'title', $this->method_title );
+		$this->use_html    = $this->get_option( 'use_html', 'yes' ) === 'yes';
 		$this->description = $this->get_option( 'description', $this->method_description );
 		$this->secret_key  = $this->get_option( 'secret_key' );
+
+		// Set up HTML fragments.
+		$this->title_icon_html         = '<img src="' . WC_HTTPS::force_https_url( $this->title_icon ) . '" alt="' . esc_attr( $this->title ) . '" class="qiwi" />';
+		$this->icon_html               = '<img src="' . WC_HTTPS::force_https_url( $this->icon ) . '" alt="' . esc_attr( $this->method_supports ) . '" />';
+		$this->method_description_html = $this->method_description . PHP_EOL
+
+			/*
+			 * translators:
+			 * ru_RU: Для начала работы с сервисом QIWI Касса необходима <a href="https://kassa.qiwi.com/" target="_blank">регистрация магазина</a>.
+			 */
+			. __( 'To start working with the QIWI cash service, you need to <a href="https://kassa.qiwi.com/" target="_blank">register a store</a>.', 'woocommerce_payment_qiwi' ) . PHP_EOL
+
+			/*
+			 * translators:
+			 * ru_RU: Так же, для вас доступен <a href="https://developer.qiwi.com/demo/" target="_blank">демонстрационный стенд</a>.
+			 */
+			. __( 'Also, a <a href="https://kassa.qiwi.com/" target="_blank">demonstration stand</a> is available for you.', 'woocommerce_payment_qiwi' );
 
 		// Setup CURL options.
 		$options = [];
@@ -135,8 +181,8 @@ class Gateway extends WC_Payment_Gateway {
 		// Capture API callback.
 		add_action( "woocommerce_api_{$this->id}", [ $this, 'woocommerce_api' ] );
 
-		// Prevent logo escape
-		add_filter('esc_html', [ $this, 'title_esc_html' ], 50, 2);
+		// Prevent html escape.
+		add_filter( 'esc_html', [ $this, 'title_esc_html' ], 50, 2 );
 
 		if ( is_admin() ) {
 			// Capture options change.
@@ -153,25 +199,37 @@ class Gateway extends WC_Payment_Gateway {
 	}
 
 	/**
+	 * Process settings change.
+	 *
+	 * @return bool
+	 */
+	public function process_admin_options() {
+		/**
+		 * The WP DB instance.
+		 *
+		 * @var \wpdb $wpdb
+		 */
+		global $wpdb;
+
+		$result         = parent::process_admin_options();
+		$this->title    = $this->get_option( 'title', $this->method_title );
+		$this->use_html = $this->get_option( 'use_html', 'yes' ) === 'yes';
+		$wpdb->query( $wpdb->prepare(
+			"UPDATE $wpdb->postmeta AS t1 LEFT JOIN $wpdb->postmeta AS t2 ON t1.`post_id` = t2.`post_id` SET t1.`meta_value` = %s WHERE t1.`meta_key` = '_payment_method_title' AND t2.`meta_key` = '_payment_method' AND t2.`meta_value` = %s",
+			$this->get_title(),
+			$this->id
+		) );
+
+		return $result;
+	}
+
+	/**
 	 * Get method description.
 	 *
 	 * @return string
 	 */
 	public function get_method_description() {
-		$method_description = $this->method_description;
-
-		/*
-		 * translators:
-		 * ru_RU: Для начала работы с сервисом QIWI Касса необходима <a href="https://kassa.qiwi.com/" target="_blank">регистрация магазина</a>.
-		 */
-		$method_description .= PHP_EOL . __( 'To start working with the QIWI cash service, you need to <a href="https://kassa.qiwi.com/" target="_blank">register a store</a>.', 'woocommerce_payment_qiwi' );
-
-		/*
-		 * translators:
-		 * ru_RU: Так же, для вас доступен <a href="https://developer.qiwi.com/demo/" target="_blank">демонстрационный стенд</a>.
-		 */
-		$method_description .= PHP_EOL . __( 'Also, a <a href="https://kassa.qiwi.com/" target="_blank">demonstration stand</a> is available for you.', 'woocommerce_payment_qiwi' );
-		return apply_filters( 'woocommerce_gateway_method_description', $method_description, $this );
+		return apply_filters( 'woocommerce_gateway_method_description', $this->method_description_html, $this );
 	}
 
 	/**
@@ -180,27 +238,19 @@ class Gateway extends WC_Payment_Gateway {
 	 * @return string
 	 */
 	public function get_title() {
-		if ( is_admin() ) {
-			return parent::get_title();
-		}
-		$title = $this->icon ? '<img src="' . WC_HTTPS::force_https_url( $this->title_icon ) . '" alt="' . esc_attr( $this->title ) . '" class="qiwi" />' : '';
-		return apply_filters( 'woocommerce_gateway_title', $title, $this->id );
+		return apply_filters( 'woocommerce_gateway_title', $this->use_html ? $this->title_icon_html : $this->title, $this->id );
 	}
 
 	/**
 	 * Return title unescaped always.
 	 *
-	 * @param $safe_text
-	 * @param $text
+	 * @param string $safe_text The safe text.
+	 * @param string $text The original text.
 	 *
 	 * @return mixed
 	 */
 	public function title_esc_html( $safe_text, $text ) {
-		static $title_text;
-		if ( is_null( $title_text ) ) {
-			$title_text = $this->get_title();
-		}
-		return $text == $title_text ? $text : $safe_text;
+		return $text === $this->title_icon_html ? $text : $safe_text;
 	}
 
 	/**
@@ -209,8 +259,7 @@ class Gateway extends WC_Payment_Gateway {
 	 * @return string
 	 */
 	public function get_icon() {
-		$icon = $this->icon ? '<span><img src="' . WC_HTTPS::force_https_url( $this->icon ) . '" alt="' . esc_attr( $this->method_supports ) . '" /></span>' : '';
-		return apply_filters( 'woocommerce_gateway_icon', $icon, $this->id );
+		return apply_filters( 'woocommerce_gateway_icon', $this->icon_html, $this->id );
 	}
 
 	/**
@@ -269,6 +318,23 @@ class Gateway extends WC_Payment_Gateway {
 				'description' => __( 'The name of the payment method displayed to customers.', 'woocommerce_payment_qiwi' ),
 				'type'        => 'text',
 				'default'     => $this->method_title,
+			],
+			'use_html'         => [
+
+				/*
+				 * translators:
+				 * ru_RU: Использовать HTML
+				 */
+				'title'   => __( 'Use logo', 'woocommerce_payment_qiwi' ),
+
+				/*
+				 * translators:
+				 * ru_RU: Модуль оплаты %1$s будет отображать логотип вместо названия
+				 * 1: Название модуля
+				 */
+				'label'   => sprintf( __( 'Payment module %1$s will show logo instead name', 'woocommerce_payment_qiwi' ), $this->method_title ),
+				'type'    => 'checkbox',
+				'default' => 'yes',
 			],
 			'description'      => [
 

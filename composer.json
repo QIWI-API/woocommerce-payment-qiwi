@@ -2,7 +2,7 @@
   "name": "qiwi/woocommerce-payment-qiwi",
   "description": "QIWI payment integration for Woocommerce",
   "type": "wordpress-plugin",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "license": "MIT",
   "homepage": "https://github.com/QIWI-API/woocommerce-payment-qiwi",
   "support": {
