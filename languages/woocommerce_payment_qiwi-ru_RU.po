@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Woocommerce QIWI payment gateway\n"
-"POT-Creation-Date: 2019-05-07 17:36+0500\n"
-"PO-Revision-Date: 2019-05-07 17:36+0500\n"
+"POT-Creation-Date: 2019-05-07 17:39+0500\n"
+"PO-Revision-Date: 2019-05-07 17:39+0500\n"
 "Last-Translator: \n"
 "Language-Team: https://github.com/QIWI-API/woocommerce-payment-qiwi\n"
 "Language: ru_RU\n"
@@ -26,7 +26,7 @@ msgstr ""
 #. translators:
 #. ru_RU: QIWI Касса
 #.
-#: includes/class-gateway.php:110 woocommerce-payment-qiwi.php:73
+#: includes/class-gateway.php:110 woocommerce-payment-qiwi.php:71
 msgid "QIWI cash"
 msgstr "QIWI Касса"
 
@@ -190,7 +190,7 @@ msgstr "Завершение возврата %1$s"
 #. %1$s: Localised plugin name
 #. %2$s: URL to instalation manual
 #.
-#: woocommerce-payment-qiwi.php:92
+#: woocommerce-payment-qiwi.php:90
 #, php-format
 msgid ""
 "<div class=\"error\"><p><strong>Error:</strong> Plugin \"%1$s\" is not "
