@@ -684,7 +684,7 @@ class Gateway extends WC_Payment_Gateway {
 		];
 
 		// Detect AJAX.
-		$request = array_key_exists( 'HTTP_X_REQUESTED_WITH', $_SERVER ) ? wp_unslash( $_SERVER['HTTP_X_REQUESTED_WITH'] ) : '';  // phpcs:ignore WordPress.VIP
+		$request = array_key_exists( 'HTTP_X_REQUESTED_WITH', $_SERVER ) ? wp_unslash( $_SERVER['HTTP_X_REQUESTED_WITH'] ) : ''; // phpcs:ignore WordPress.VIP
 		if ( strtolower( $request ) === 'xmlhttprequest' ) {
 			wp_send_json( apply_filters( 'woocommerce_payment_successful_result', $result, $order_id ) );
 		}
