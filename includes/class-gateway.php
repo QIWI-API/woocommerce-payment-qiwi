@@ -25,11 +25,6 @@ use Qiwi\Api\BillPayments;
  */
 class Gateway extends WC_Payment_Gateway {
 	/**
-	 * The signature header.
-	 */
-	const HEADER_SIGNATURE = 'X-Api-Signature-SHA256';
-
-	/**
 	 * ID of the class extending the settings API. Used in option names.
 	 *
 	 * @var string
@@ -58,6 +53,20 @@ class Gateway extends WC_Payment_Gateway {
 	protected $secret_key;
 
 	/**
+	 * The theme code.
+	 *
+	 * @var string
+	 */
+	protected $theme_code;
+
+	/**
+	 * The alive time.
+	 *
+	 * @var int
+	 */
+	protected $alive_time;
+
+	/**
 	 * The supported ways.
 	 *
 	 * @var string
@@ -79,6 +88,20 @@ class Gateway extends WC_Payment_Gateway {
 	protected $use_html;
 
 	/**
+	 * The use popup flag.
+	 *
+	 * @var bool
+	 */
+	protected $use_popup;
+
+	/**
+	 * The use debug flag.
+	 *
+	 * @var bool
+	 */
+	protected $use_debug;
+
+	/**
 	 * The title icon HTML.
 	 *
 	 * @var string
@@ -98,6 +121,13 @@ class Gateway extends WC_Payment_Gateway {
 	 * @var string
 	 */
 	protected $method_description_html;
+
+	/**
+	 * Woocommerce logger.
+	 *
+	 * @var /WC_Logger_Interface
+	 */
+	protected $logger;
 
 	/**
 	 * Gateway constructor.
@@ -124,6 +154,9 @@ class Gateway extends WC_Payment_Gateway {
 		// Getaway accept billing and refunding.
 		$this->supports = [ 'products', 'refunds' ];
 
+		// Setup logger.
+		$this->logger = wc_get_logger();
+
 		// Setup icons.
 		$this->icon       = plugins_url( 'assets/payments.svg', __DIR__ );
 		$this->title_icon = plugins_url( 'assets/logo_kassa.svg', __DIR__ );
@@ -134,29 +167,24 @@ class Gateway extends WC_Payment_Gateway {
 		// Initialise config and form.
 		$this->init_form_fields();
 		$this->init_settings();
-
-		// Set up from options.
-		$this->title       = $this->get_option( 'title', $this->method_title );
-		$this->use_html    = $this->get_option( 'use_html', 'yes' ) === 'yes';
-		$this->description = $this->get_option( 'description', $this->method_description );
-		$this->secret_key  = $this->get_option( 'secret_key' );
+		$this->init_options();
 
 		// Set up HTML fragments.
 		$this->title_icon_html         = '<img src="' . WC_HTTPS::force_https_url( $this->title_icon ) . '" alt="' . esc_attr( $this->title ) . '" class="qiwi" />';
 		$this->icon_html               = '<img src="' . WC_HTTPS::force_https_url( $this->icon ) . '" alt="' . esc_attr( $this->method_supports ) . '" />';
-		$this->method_description_html = $this->method_description . PHP_EOL
+		$this->method_description_html = $this->method_description . PHP_EOL .
 
 			/*
 			 * translators:
 			 * ru_RU: Для начала работы с сервисом QIWI Касса необходима <a href="https://kassa.qiwi.com/" target="_blank">регистрация магазина</a>.
 			 */
-			. __( 'To start working with the QIWI cash service, you need to <a href="https://kassa.qiwi.com/" target="_blank">register a store</a>.', 'woocommerce_payment_qiwi' ) . PHP_EOL
+			__( 'To start working with the QIWI cash service, you need to <a href="https://kassa.qiwi.com/" target="_blank">register a store</a>.', 'woocommerce_payment_qiwi' ) . PHP_EOL .
 
 			/*
 			 * translators:
 			 * ru_RU: Так же, для вас доступен <a href="https://developer.qiwi.com/demo/" target="_blank">демонстрационный стенд</a>.
 			 */
-			. __( 'Also, a <a href="https://kassa.qiwi.com/" target="_blank">demonstration stand</a> is available for you.', 'woocommerce_payment_qiwi' );
+			__( 'Also, a <a href="https://kassa.qiwi.com/" target="_blank">demonstration stand</a> is available for you.', 'woocommerce_payment_qiwi' );
 
 		// Setup CURL options.
 		$options = [];
@@ -188,6 +216,18 @@ class Gateway extends WC_Payment_Gateway {
 			// Capture options change.
 			add_action( "woocommerce_update_options_payment_gateways_{$this->id}", [ $this, 'process_admin_options' ] );
 		} else {
+			// Add frontend scripts.
+			if ( $this->use_popup ) {
+				wp_register_script( 'qiwi-oplata-popup', 'https://oplata.qiwi.com/popup/v1.js' );
+				wp_enqueue_script(
+					'woocommerce-payment-qiwi-popup',
+					plugins_url( '/assets/popup.js', __DIR__ ),
+					[ 'qiwi-oplata-popup', 'wc-checkout' ],
+					filemtime( dirname( __DIR__ ) . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'popup.js' ),
+					true
+				);
+			}
+
 			// Add frontend style.
 			wp_enqueue_style(
 				'woocommerce-payment-qiwi',
@@ -196,6 +236,32 @@ class Gateway extends WC_Payment_Gateway {
 				filemtime( dirname( __DIR__ ) . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'qiwi.css' )
 			);
 		}
+	}
+
+	/**
+	 * Log debug message.
+	 *
+	 * @param string $message The message.
+	 * @param array  $context The context.
+	 */
+	protected function log( $message, $context ) {
+		if ( $this->use_debug ) {
+			$this->logger->debug( $message, $context );
+		}
+	}
+
+	/**
+	 * Load options.
+	 */
+	protected function init_options() {
+		$this->title       = $this->get_option( 'title', $this->method_title );
+		$this->use_html    = $this->get_option( 'use_html', 'yes' ) === 'yes';
+		$this->description = $this->get_option( 'description', $this->method_description );
+		$this->secret_key  = $this->get_option( 'secret_key' );
+		$this->theme_code  = $this->get_option( 'alive_time' );
+		$this->alive_time  = intval( $this->get_option( 'alive_time', 45 ) );
+		$this->use_popup   = $this->get_option( 'use_popup', 'not' ) === 'yes';
+		$this->use_debug   = $this->get_option( 'use_debug' ) === 'yes';
 	}
 
 	/**
@@ -211,9 +277,8 @@ class Gateway extends WC_Payment_Gateway {
 		 */
 		global $wpdb;
 
-		$result         = parent::process_admin_options();
-		$this->title    = $this->get_option( 'title', $this->method_title );
-		$this->use_html = $this->get_option( 'use_html', 'yes' ) === 'yes';
+		$result = parent::process_admin_options();
+		$this->init_options();
 		$wpdb->query( $wpdb->prepare(
 			"UPDATE $wpdb->postmeta AS t1 LEFT JOIN $wpdb->postmeta AS t2 ON t1.`post_id` = t2.`post_id` SET t1.`meta_value` = %s WHERE t1.`meta_key` = '_payment_method_title' AND t2.`meta_key` = '_payment_method' AND t2.`meta_value` = %s",
 			$this->get_title(),
@@ -399,6 +464,53 @@ class Gateway extends WC_Payment_Gateway {
 				'description' => __( 'Personalization code of the payment form style is presented in the payment system store settings.', 'woocommerce_payment_qiwi' ),
 				'type'        => 'text',
 			],
+			'alive_time'       => [
+
+				/*
+				 * translators:
+				 * ru_RU: Время ожидания оплаты
+				 */
+				'title'       => __( 'Waiting payment time', 'woocommerce_payment_qiwi' ),
+
+				/*
+				 * translators:
+				 * ru_RU: Максимальное время ожидания оплаты по счету в днях.
+				 */
+				'description' => __( 'The maximum waiting time for payment on the order in days.', 'woocommerce_payment_qiwi' ),
+				'type'        => 'text',
+			],
+			'use_popup'        => [
+
+				/*
+				 * translators:
+				 * ru_RU: Всплывающая форма оплаты
+				 */
+				'title'       => __( 'Payment form popup', 'woocommerce_payment_qiwi' ),
+
+				/*
+				 * translators:
+				 * ru_RU: Использовать всплывающую форму оплаты на странице магазина, вместо перехода на сайт QIWI Касса.
+				 */
+				'description' => __( 'Use the pop-up payment form on the store page, instead of going to the QIWI Kassa website.', 'woocommerce_payment_qiwi' ),
+				'type'        => 'checkbox',
+				'default'     => 'not',
+			],
+			'use_debug'        => [
+
+				/*
+				 * translators:
+				 * ru_RU: Режим отладки
+				 */
+				'title'       => __( 'Debug mode', 'woocommerce_payment_qiwi' ),
+
+				/*
+				 * translators:
+				 * ru_RU: Включить логирование запросов API QIWI Касса.
+				 */
+				'description' => __( 'Enable logging QIWI Kassa API requests.', 'woocommerce_payment_qiwi' ),
+				'type'        => 'checkbox',
+				'default'     => 'not',
+			],
 		];
 	}
 
@@ -412,7 +524,27 @@ class Gateway extends WC_Payment_Gateway {
 		$notice = json_decode( $body, true );
 
 		// Check signature.
-		if ( ! $this->bill_payments->checkNotificationSignature( $sign, $notice, $this->secret_key ) ) {
+		$result = $this->bill_payments->checkNotificationSignature( $sign, $notice, $this->secret_key );
+		$this->log(
+			$result ?
+
+				/*
+				 * translators:
+				 * ru_RU: Получено действительное уведомление
+				 */
+				__( 'Received valid notification', 'woocommerce_payment_qiwi' ) :
+
+				/*
+				 * translators:
+				 * ru_RU: Получено недействительное уведомление
+				 */
+				__( 'Received invalid notification', 'woocommerce_payment_qiwi' ),
+			[
+				'sign'   => $sign,
+				'notice' => $notice,
+			]
+		);
+		if ( ! $result ) {
 			wp_send_json( [ 'error' => 403 ], 403 );
 		}
 
@@ -468,18 +600,31 @@ class Gateway extends WC_Payment_Gateway {
 			// Need to create bill transaction.
 			if ( empty( $bill_id ) ) {
 				$bill_id = $this->bill_payments->generateId();
-				$bill    = $this->bill_payments->createBill( $bill_id, [
+				$params  = [
 					'amount'             => $order->get_total(),
 					'currency'           => $order->get_currency(),
-					'expirationDateTime' => $this->bill_payments->getLifetimeByDay(),
+					'expirationDateTime' => $this->bill_payments->getLifetimeByDay( $this->alive_time ),
 					'phone'              => $order->get_billing_phone(),
 					'email'              => $order->get_billing_email(),
 					'account'            => $order->get_user_id(),
 					'successUrl'         => $this->get_return_url( $order ),
 					'customFields'       => array_filter([
-						'themeCode' => $this->get_option( 'theme_code' ),
+						'themeCode' => $this->theme_code,
 					]),
-				] );
+				];
+				$bill    = $this->bill_payments->createBill( $bill_id, $params );
+				$this->log(
+
+					/*
+					 * translators:
+					 * ru_RU: Создан счет
+					 */
+					__( 'Create bill', 'woocommerce_payment_qiwi' ),
+					[
+						'params' => $params,
+						'bill'   => $bill,
+					]
+				);
 				$order->set_transaction_id( $bill_id );
 				$order->save();
 
@@ -490,23 +635,61 @@ class Gateway extends WC_Payment_Gateway {
 				wc_empty_cart();
 			} elseif ( ! $order->is_paid() && $order->get_status() === 'cancelled' ) {
 				$bill = $this->bill_payments->cancelBill( $bill_id );
+				$this->log(
+
+					/*
+					 * translators:
+					 * ru_RU: Завершен счет
+					 */
+					__( 'Cancel bill', 'woocommerce_payment_qiwi' ),
+					[
+						'bill_id' => $bill_id,
+						'bill'    => $bill,
+					]
+				);
 			} else {
 				$bill = $this->bill_payments->getBillInfo( $bill_id );
+				$this->log(
+
+					/*
+					 * translators:
+					 * ru_RU: Получена информация о счете
+					 */
+					__( 'Get bill info', 'woocommerce_payment_qiwi' ),
+					[
+						'bill_id' => $bill_id,
+						'bill'    => $bill,
+					]
+				);
 			}
 		} catch ( Exception $exception ) {
 			wc_add_wp_error_notices( new WP_Error(
 				$exception->getCode(),
-				$exception->getMessage(),
+
+				/*
+				 * translators:
+				 * ru_RU: Ошибка обращения к QIWI Касса
+				 */
+				__( 'QIWI Kassa request error', 'woocommerce_payment_qiwi' ) . '<br>' . $exception->getMessage(),
 				$exception
 			) );
 			return [ 'result' => 'fail' ];
 		}
 
 		// Return thank you redirect.
-		return [
+		$result = [
 			'result'   => 'success',
+			'success'  => $this->get_return_url( $order ),
 			'redirect' => $this->bill_payments->getPayUrl( $bill, $this->get_return_url( $order ) ),
 		];
+
+		// Detect AJAX.
+		$request = array_key_exists( 'HTTP_X_REQUESTED_WITH', $_SERVER ) ? wp_unslash( $_SERVER['HTTP_X_REQUESTED_WITH'] ) : ''; // phpcs:ignore WordPress.VIP
+		if ( strtolower( $request ) === 'xmlhttprequest' ) {
+			wp_send_json( apply_filters( 'woocommerce_payment_successful_result', $result, $order_id ) );
+		}
+
+		return $result;
 	}
 
 	/**
@@ -536,6 +719,21 @@ class Gateway extends WC_Payment_Gateway {
 		// Refund transaction.
 		try {
 			$refund = $this->bill_payments->refund( $bill_id, $refund_id, $amount, $order->get_currency() );
+			$this->log(
+
+				/*
+				 * translators:
+				 * ru_RU: Создан возврат по счету
+				 */
+				__( 'Create bill refund', 'woocommerce_payment_qiwi' ),
+				[
+					'bill_id'   => $bill_id,
+					'refund_id' => $refund_id,
+					'amount'    => $amount,
+					'currency'  => $order->get_currency(),
+					'refund'    => $refund,
+				]
+			);
 		} catch ( Exception $exception ) {
 			return new WP_Error(
 				$exception->getCode(),
