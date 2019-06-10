@@ -27,7 +27,7 @@ jQuery( function ($) {
 			}
 
 			// change checkout logic for popup
-			this.$order_review.on( 'checkout_place_order', qiwi_popup.placeOrder);
+			this.$checkout_form.on( 'checkout_place_order_qiwi', qiwi_popup.placeOrder);
 		},
 		paymentOrder: function (event) {
 			if (qiwi_popup.paymentOrderNoDefault) {
