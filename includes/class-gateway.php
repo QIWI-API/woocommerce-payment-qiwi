@@ -246,7 +246,7 @@ class Gateway extends WC_Payment_Gateway {
 	 */
 	protected function log( $message, $context ) {
 		if ( $this->use_debug ) {
-			$this->logger->debug( $message, $context );
+			$this->logger->debug( $message . ': ' .  print_r( $context, true ) );
 		}
 	}
 
@@ -593,12 +593,11 @@ class Gateway extends WC_Payment_Gateway {
 	public function process_payment( $order_id ) {
 		// Get processed data.
 		$order   = wc_get_order( $order_id );
-		$bill_id = $order->get_transaction_id();
 
 		// Return notice on trow.
 		try {
 			// Need to create bill transaction.
-			if ( empty( $bill_id ) ) {
+			if ( $order->get_status() === 'pending' ) {
 				$bill_id = $this->bill_payments->generateId();
 				$params  = [
 					'amount'             => $order->get_total(),
