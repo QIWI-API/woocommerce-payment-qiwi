@@ -3,7 +3,7 @@
  * Plugin Name: Woocommerce QIWI payment gateway
  * Plugin URI:  https://github.com/QIWI-API/woocommerce-payment-qiwi
  * Description: QIWI universal payment API integration for Woocommerce
- * Version:     0.0.7
+ * Version:     0.0.8
  * Author:      QIWI
  * Author URI:  https://qiwi.com/
  * License:     MIT

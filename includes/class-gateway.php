@@ -258,7 +258,7 @@ class Gateway extends WC_Payment_Gateway {
 		$this->use_html    = $this->get_option( 'use_html', 'yes' ) === 'yes';
 		$this->description = $this->get_option( 'description', $this->method_description );
 		$this->secret_key  = $this->get_option( 'secret_key' );
-		$this->theme_code  = $this->get_option( 'alive_time' );
+		$this->theme_code  = $this->get_option( 'theme_code' );
 		$this->alive_time  = intval( $this->get_option( 'alive_time', 45 ) );
 		$this->use_popup   = $this->get_option( 'use_popup', 'not' ) === 'yes';
 		$this->use_debug   = $this->get_option( 'use_debug' ) === 'yes';
