@@ -246,7 +246,9 @@ class Gateway extends WC_Payment_Gateway {
 	 */
 	protected function log( $message, $context ) {
 		if ( $this->use_debug ) {
-			$this->logger->debug( $message . ': ' .  print_r( $context, true ) );
+			//phpcs:disable WordPress.PHP.DevelopmentFunctions.error_log_print_r -- Because on debug mode only.
+			$this->logger->debug( $message . ': ' . print_r( $context, true ) );
+			//phpcs:enable WordPress.PHP.DevelopmentFunctions.error_log_print_r
 		}
 	}
 
@@ -279,6 +281,12 @@ class Gateway extends WC_Payment_Gateway {
 
 		$result = parent::process_admin_options();
 		$this->init_options();
+
+		/**
+		 * Query for update payment title on old bills.
+		 *
+		 * @noinspection SqlResolve
+		 */
 		$wpdb->query( $wpdb->prepare(
 			"UPDATE $wpdb->postmeta AS t1 LEFT JOIN $wpdb->postmeta AS t2 ON t1.`post_id` = t2.`post_id` SET t1.`meta_value` = %s WHERE t1.`meta_key` = '_payment_method_title' AND t2.`meta_key` = '_payment_method' AND t2.`meta_value` = %s",
 			$this->get_title(),
@@ -593,6 +601,7 @@ class Gateway extends WC_Payment_Gateway {
 	public function process_payment( $order_id ) {
 		// Get processed data.
 		$order   = wc_get_order( $order_id );
+		$bill_id = $order->get_transaction_id();
 
 		// Return notice on trow.
 		try {
@@ -662,14 +671,14 @@ class Gateway extends WC_Payment_Gateway {
 				);
 			}
 		} catch ( Exception $exception ) {
+			/*
+			 * translators:
+			 * ru_RU: Ошибка обращения к QIWI Касса
+			 */
+			$message = __( 'QIWI Kassa request error', 'woocommerce_payment_qiwi' );
 			wc_add_wp_error_notices( new WP_Error(
 				$exception->getCode(),
-
-				/*
-				 * translators:
-				 * ru_RU: Ошибка обращения к QIWI Касса
-				 */
-				__( 'QIWI Kassa request error', 'woocommerce_payment_qiwi' ) . '<br>' . $exception->getMessage(),
+				$message . '<br>' . $exception->getMessage(),
 				$exception
 			) );
 			return [ 'result' => 'fail' ];
