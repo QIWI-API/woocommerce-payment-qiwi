@@ -8,12 +8,6 @@
   "support": {
     "issues": "https://github.com/QIWI-API/woocommerce-payment-qiwi/issues"
   },
-  "repositories": [
-    {
-      "type": "composer",
-      "url": "https://wpackagist.org"
-    }
-  ],
   "require": {
     "php": ">=7",
     "ext-curl": "*",
@@ -27,7 +21,8 @@
     "phpdocumentor/phpdocumentor": "^2",
     "squizlabs/php_codesniffer": "^3",
     "wimg/php-compatibility": "^8",
-    "wp-coding-standards/wpcs": "^0"
+    "wp-coding-standards/wpcs": "^0",
+    "wannabe-pro/composer-release-plugin-zip": "^0"
   },
   "autoload": {
     "classmap": [
@@ -39,11 +34,36 @@
     "code": "phpcs --encoding=utf-8 -s -p woocommerce-payment-qiwi.php includes"
   },
   "extra": {
-    "installer-disable": true
-  },
-  "config": {
-    "platform": {
-      "php": "7.0"
+    "installer-disable": true,
+    "build-plugin-dev": {
+      "build/woocommerce-payment-qiwi.zip": {
+        "builder": "zip",
+        "composer": {
+          "minimum-stability": "stable",
+          "prefer-stable": true,
+          "require": {
+            "qiwi/bill-payments-php-sdk": "=0.1.2"
+          },
+          "config": {
+            "platform": {
+              "php": "5.6.0"
+            }
+          }
+        },
+        "mapper": {
+          "/^.*\\.php$/": "/woocommerce-payment-qiwi/$0",
+          "/^.*cacert\\.pem$/": "/woocommerce-payment-qiwi/$0",
+          "/^.*\\.svg$/": "/woocommerce-payment-qiwi/$0",
+          "/^.*\\.js$/": "/woocommerce-payment-qiwi/$0",
+          "/^.*\\.css/": "/woocommerce-payment-qiwi/$0",
+          "/^.*\\.mo$/": "/woocommerce-payment-qiwi/$0",
+          "/^.*\\.po$/": "/woocommerce-payment-qiwi/$0",
+          "/^.*\\.pot$/": "/woocommerce-payment-qiwi/$0",
+          "/^.*\\.md$/": "/woocommerce-payment-qiwi/$0",
+          "/^LICENSE$/": "/woocommerce-payment-qiwi/$0",
+          "/^vendor((?!(BillPayments\\.php|BillPaymentsException\\.php|Curl\\.php)).)*$/": false
+        }
+      }
     }
   }
 }
