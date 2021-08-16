@@ -54,10 +54,6 @@ add_action( 'woocommerce_init', function () {
 	}
 
 	// Autoload for standalone composer build or composer's WordPress instalations.
-	if ( ! class_exists( 'Curl\Curl' ) ) {
-		require_once __DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'curl' . DIRECTORY_SEPARATOR . 'curl' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Curl' . DIRECTORY_SEPARATOR . 'Curl.php';
-	}
-
 	if ( ! class_exists( 'Qiwi\Api\BillPaymentsException' ) ) {
 		require_once __DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'qiwi' . DIRECTORY_SEPARATOR . 'bill-payments-php-sdk' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'BillPaymentsException.php';
 	}
