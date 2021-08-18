@@ -129,6 +129,101 @@ class Gateway extends WC_Payment_Gateway {
 	 */
 	protected $logger;
 
+
+	/**
+	 * Output sync page.
+	 */
+	public static function page_sync() {
+		wp_enqueue_style(
+			'woocommerce-payment-qiwi-sync',
+			plugins_url( '/assets/sync.css', __DIR__ ),
+			[ ],
+			filemtime( dirname( __DIR__ ) . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'sync.css' )
+		);
+		wp_enqueue_script(
+			'woocommerce-payment-qiwi-sync',
+			plugins_url( '/assets/sync.js', __DIR__ ),
+			[ 'jquery' ],
+			filemtime( dirname( __DIR__ ) . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'sync.js' ),
+			true
+		);
+		wp_localize_script(
+			'woocommerce-payment-qiwi-sync',
+			'woocommerce_payment_qiwi_sync',
+			[
+				'url' => admin_url('admin-ajax.php'),
+				'nonce' => wp_create_nonce('wp_ajax_woocommerce_payment_qiwi_sync'),
+				'beforeunload' =>
+					/*
+					 * translators:
+					 * ru_RU: Прервать синхронизацию?
+					 */
+					__( 'Stop syncing?', 'woocommerce_payment_qiwi' ),
+				'error' =>
+					/*
+					 * translators:
+					 * ru_RU: Ошибка синхронизации.
+					 */
+					__( 'Syncing error.', 'woocommerce_payment_qiwi' ),
+				'end' =>
+					/*
+					 * translators:
+					 * ru_RU: Синхронизация завершена!
+					 */
+					__( 'Synchronization complete!', 'woocommerce_payment_qiwi' ),
+				'single' =>
+					/*
+					 * translators:
+					 * ru_RU: [{0}/{1}] Преверка состояния платежа для заказа №{2}
+					 */
+					__( '[{0}/{1}] Checking the status of payment for an order #{2}', 'woocommerce_payment_qiwi' ),
+				'success' =>
+					/*
+					 * translators:
+					 * ru_RU:  - Успех
+					 */
+					__( ' - Success', 'woocommerce_payment_qiwi' ),
+			]
+		);
+
+		require_once 'page-sync.php';
+	}
+
+	public static function ajax_sync( ) {
+		check_ajax_referer( 'wp_ajax_woocommerce_payment_qiwi_sync', 'nonce' );
+		if ( !is_admin() ) {
+			wp_die(
+				/*
+				 * translators:
+				 * ru_RU: Это действие доступно только для администраторов.
+				 */
+				__( 'This action is only available for administrators.', 'woocommerce_payment_qiwi' )
+			);
+		}
+
+		$response = [
+			'nonce' => wp_create_nonce('wp_ajax_woocommerce_payment_qiwi_sync')
+		];
+		$order_id = $_POST['order_id'];
+		if ( $order_id ) {
+			$payment = wc_get_payment_gateway_by_order( $order_id );
+			if ( $payment instanceof Gateway ) {
+				$result = $payment->process_order( $order_id );
+
+				$response['message'] = $result['result'];
+			}
+		} else {
+			$response['list'] = wc_get_orders( [
+				'limit'          => -1,
+				'return'         => 'ids',
+				'status'         => 'wc-pending',
+				'payment_method' => 'qiwi',
+			] );
+		}
+
+		wp_send_json( $response );
+	}
+
 	/**
 	 * Gateway constructor.
 	 */
@@ -184,7 +279,13 @@ class Gateway extends WC_Payment_Gateway {
 			 * translators:
 			 * ru_RU: Так же, для вас доступен <a href="https://developer.qiwi.com/demo/" target="_blank">демонстрационный стенд</a>.
 			 */
-			__( 'Also, a <a href="https://kassa.qiwi.com/" target="_blank">demonstration stand</a> is available for you.', 'woocommerce_payment_qiwi' );
+			__( 'Also, a <a href="https://kassa.qiwi.com/" target="_blank">demonstration stand</a> is available for you.', 'woocommerce_payment_qiwi' ) . PHP_EOL .
+
+			/*
+			 * translators:
+			 * ru_RU: Напоминаем, что P2P счета не поддерживает возврат. Вы можете самостоятельно произвести возврат сделав перевод отправителю в вашем QIWI Кошельке.
+			 */
+			__( 'Please be reminded that P2P accounts do not support refunds. You can make a refund yourself by making a transfer to the sender in your QIWI Wallet.', 'woocommerce_payment_qiwi' );
 
 		// Setup CURL options.
 		$options = [];
@@ -522,6 +623,29 @@ class Gateway extends WC_Payment_Gateway {
 		];
 	}
 
+	public function process_status($status, $order) {
+		switch ( $status ) {
+			case 'WAITING':
+				$order->update_status( 'pending' );
+				break;
+			case 'PAID':
+				$order->payment_complete();
+				break;
+			case 'REJECTED':
+				$order->update_status( 'canceled' );
+				break;
+			case 'EXPIRED':
+				$order->update_status( 'failed' );
+				break;
+			case 'PARTIAL':
+				$order->update_status( 'processing' );
+				break;
+			case 'FULL':
+				$order->update_status( 'refunded' );
+				break;
+		}
+	}
+
 	/**
 	 * Process QIWI notification.
 	 */
@@ -569,36 +693,11 @@ class Gateway extends WC_Payment_Gateway {
 		$order = reset( $orders );
 
 		// Process status.
-		switch ( $notice['bill']['status']['value'] ) {
-			case 'WAITING':
-				$order->update_status( 'pending' );
-				break;
-			case 'PAID':
-				$order->payment_complete();
-				break;
-			case 'REJECTED':
-				$order->update_status( 'canceled' );
-				break;
-			case 'EXPIRED':
-				$order->update_status( 'failed' );
-				break;
-			case 'PARTIAL':
-				$order->update_status( 'processing' );
-				break;
-			case 'FULL':
-				$order->update_status( 'refunded' );
-				break;
-		}
+		$this->process_status( $notice['bill']['status']['value'], $order );
 		wp_send_json( [ 'error' => 0 ], 200 );
 	}
 
-	/**
-	 * Process the payment and return the result.
-	 *
-	 * @param int $order_id The order ID.
-	 * @return array
-	 */
-	public function process_payment( $order_id ) {
+	public function process_order( $order_id ) {
 		// Get processed data.
 		$order   = wc_get_order( $order_id );
 		$bill_id = $order->get_transaction_id();
@@ -606,7 +705,7 @@ class Gateway extends WC_Payment_Gateway {
 		// Return notice on trow.
 		try {
 			// Need to create bill transaction.
-			if ( $order->get_status() === 'pending' ) {
+			if ( $order->get_status() === 'pending' && empty( $bill_id ) ) {
 				$bill_id = $this->bill_payments->generateId();
 				$params  = [
 					'amount'             => $order->get_total(),
@@ -623,10 +722,10 @@ class Gateway extends WC_Payment_Gateway {
 				$bill    = $this->bill_payments->createBill( $bill_id, $params );
 				$this->log(
 
-					/*
-					 * translators:
-					 * ru_RU: Создан счет
-					 */
+				/*
+				 * translators:
+				 * ru_RU: Создан счет
+				 */
 					__( 'Create bill', 'woocommerce_payment_qiwi' ),
 					[
 						'params' => $params,
@@ -645,10 +744,10 @@ class Gateway extends WC_Payment_Gateway {
 				$bill = $this->bill_payments->cancelBill( $bill_id );
 				$this->log(
 
-					/*
-					 * translators:
-					 * ru_RU: Завершен счет
-					 */
+				/*
+				 * translators:
+				 * ru_RU: Завершен счет
+				 */
 					__( 'Cancel bill', 'woocommerce_payment_qiwi' ),
 					[
 						'bill_id' => $bill_id,
@@ -657,12 +756,14 @@ class Gateway extends WC_Payment_Gateway {
 				);
 			} else {
 				$bill = $this->bill_payments->getBillInfo( $bill_id );
+				$this->process_status( $bill['status']['value'], $order );
+
 				$this->log(
 
-					/*
-					 * translators:
-					 * ru_RU: Получена информация о счете
-					 */
+				/*
+				 * translators:
+				 * ru_RU: Получена информация о счете
+				 */
 					__( 'Get bill info', 'woocommerce_payment_qiwi' ),
 					[
 						'bill_id' => $bill_id,
@@ -690,6 +791,18 @@ class Gateway extends WC_Payment_Gateway {
 			'success'  => $this->get_return_url( $order ),
 			'redirect' => $this->bill_payments->getPayUrl( $bill, $this->get_return_url( $order ) ),
 		];
+
+		return $result;
+	}
+
+	/**
+	 * Process the payment and return the result.
+	 *
+	 * @param int $order_id The order ID.
+	 * @return array
+	 */
+	public function process_payment( $order_id ) {
+		$result = $this->process_order( $order_id );
 
 		// Detect AJAX.
 		$request = array_key_exists( 'HTTP_X_REQUESTED_WITH', $_SERVER ) ? wp_unslash( $_SERVER['HTTP_X_REQUESTED_WITH'] ) : ''; // phpcs:ignore WordPress.VIP

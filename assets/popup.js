@@ -4,7 +4,7 @@
  * @package woocommerce-payment-qiwi
  */
 
-jQuery( function ($) {
+jQuery( function ( $ ) {
 
 	// wc_checkout_params is required to continue, ensure the object exists
 	if ( typeof wc_checkout_params === 'undefined' ) {
@@ -27,9 +27,9 @@ jQuery( function ($) {
 			}
 
 			// change checkout logic for popup
-			this.$checkout_form.on( 'checkout_place_order_qiwi', qiwi_popup.placeOrder);
+			this.$checkout_form.on( 'checkout_place_order_qiwi', qiwi_popup.placeOrder );
 		},
-		paymentOrder: function (event) {
+		paymentOrder: function ( event ) {
 			if (qiwi_popup.paymentOrderNoDefault) {
 				event.preventDefault();
 
@@ -41,14 +41,14 @@ jQuery( function ($) {
 				$.ajaxSetup( { dataFilter: qiwi_popup.dataFilter } );
 
 				$.ajax( {
-					type:		'POST',
-					url:		window.location,
-					data:		$form.serialize(),
-					dataType:	'json',
-					success:	qiwi_popup.submitSuccess,
-					error:		function () {
+					type:     'POST',
+					url:      window.location,
+					data:     $form.serialize(),
+					dataType: 'json',
+					success:  qiwi_popup.submitSuccess,
+					error:    function () {
 						qiwi_popup.paymentOrderNoDefault = false;
-						$form.trigger('submit');
+						$form.trigger( 'submit' );
 					}
 				} );
 			}
@@ -62,12 +62,12 @@ jQuery( function ($) {
 			$.ajaxSetup( { dataFilter: qiwi_popup.dataFilter } );
 
 			$.ajax( {
-				type:		'POST',
-				url:		wc_checkout_params.checkout_url,
-				data:		$form.serialize(),
-				dataType:	'json',
-				success:	qiwi_popup.submitSuccess,
-				error:		qiwi_popup.submitError
+				type:    'POST',
+				url:      wc_checkout_params.checkout_url,
+				data:     $form.serialize(),
+				dataType: 'json',
+				success:  qiwi_popup.submitSuccess,
+				error:    qiwi_popup.submitError
 			} );
 
 			return false;
@@ -82,7 +82,7 @@ jQuery( function ($) {
 				return raw_response;
 			} else {
 				// Attempt to fix the malformed JSON
-				var maybe_valid_json = raw_response.match( /{"result.*}/ );
+				let maybe_valid_json = raw_response.match( /{"result.*}/ );
 
 				if ( null === maybe_valid_json ) {
 					console.log( 'Unable to fix malformed JSON' );
@@ -149,7 +149,7 @@ jQuery( function ($) {
 			$( document.body ).trigger( 'checkout_error' );
 		},
 		scroll_to_notices: function() {
-			var scrollElement = $( '.woocommerce-NoticeGroup-updateOrderReview, .woocommerce-NoticeGroup-checkout' );
+			let scrollElement = $( '.woocommerce-NoticeGroup-updateOrderReview, .woocommerce-NoticeGroup-checkout' );
 
 			if ( ! scrollElement.length ) {
 				scrollElement = $( '.form.checkout' );
@@ -157,21 +157,21 @@ jQuery( function ($) {
 			$.scroll_to_notices( scrollElement );
 		},
 		blockOnSubmit: function( $form ) {
-			var form_data = $form.data();
+			let form_data = $form.data();
 
 			if ( 1 !== form_data['blockUI.isBlocked'] ) {
 				$form.block({
-					message: null,
+					message:    null,
 					overlayCSS: {
 						background: '#fff',
-						opacity: 0.6
+						opacity:    0.6
 					}
 				});
 			}
 		},
 		is_valid_json: function( raw_json ) {
 			try {
-				var json = $.parseJSON( raw_json );
+				let json = $.parseJSON( raw_json );
 
 				return ( json && 'object' === typeof json );
 			} catch ( e ) {
@@ -182,4 +182,4 @@ jQuery( function ($) {
 
 	qiwi_popup.init();
 
-});
+} );

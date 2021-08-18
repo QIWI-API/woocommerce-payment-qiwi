@@ -3,7 +3,7 @@
  * Plugin Name: Woocommerce QIWI payment gateway
  * Plugin URI:  https://github.com/QIWI-API/woocommerce-payment-qiwi
  * Description: QIWI universal payment API integration for Woocommerce
- * Version:     0.0.9
+ * Version:     0.1.1
  * Author:      QIWI
  * Author URI:  https://qiwi.com/
  * License:     MIT
@@ -68,19 +68,29 @@ add_action( 'woocommerce_init', function () {
 
 	// Ready for use or noticie broken installation.
 	if ( class_exists( 'Qiwi\Payment\Gateway' ) ) {
-		// Add menu link.
+		// Add menu links.
 		add_action( 'admin_menu', function () {
 			/*
 			 * translators:
 			 * ru_RU: QIWI Касса
 			 */
-			$title = __( 'QIWI cash', 'woocommerce_payment_qiwi' );
-			add_submenu_page( 'woocommerce', $title, $title, 'manage_woocommerce', 'admin.php?page=wc-settings&tab=checkout&section=qiwi' );
+			$config_page = __( 'QIWI cash', 'woocommerce_payment_qiwi' );
+			add_submenu_page( 'woocommerce', $config_page, $config_page, 'manage_woocommerce', 'admin.php?page=wc-settings&tab=checkout&section=qiwi' );
+			/*
+			 * translators:
+			 * ru_RU: Синхронизация счетов QIWI Касса
+			 */
+			$sync_page = __( 'Sync QIWI cash bills', 'woocommerce_payment_qiwi' );
+			add_submenu_page( 'woocommerce', $sync_page, $sync_page, 'manage_woocommerce', 'woocommerce_payment_qiwi_sync', [ 'Qiwi\Payment\Gateway', 'page_sync' ] );
 		}, 51 );
+
+		// Add AJAX handlers
+		add_action( 'wp_ajax_woocommerce_payment_qiwi_sync', [ 'Qiwi\Payment\Gateway', 'ajax_sync' ] );
+
 
 		// Add gateway.
 		add_filter( 'woocommerce_payment_gateways', function ( $methods ) {
-			$methods[] = \Qiwi\Payment\Gateway::class;
+			$methods[] = 'Qiwi\Payment\Gateway';
 			return $methods;
 		} );
 	} else {
